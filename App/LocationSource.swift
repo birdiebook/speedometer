@@ -49,6 +49,9 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         for location in locations {
+            #if DEBUG
+            NSLog("LOC speed=%.2f speedAcc=%.2f hAcc=%.1f", location.speed, location.speedAccuracy, location.horizontalAccuracy)
+            #endif
             // METOD M1: CLLocation reports negative values when the field is invalid.
             onSample?(GPSSample(
                 time: location.timestamp.timeIntervalSinceReferenceDate,

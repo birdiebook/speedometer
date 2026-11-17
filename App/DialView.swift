@@ -9,6 +9,8 @@ struct DialView: View {
     let maxSpeed: Double     // m/s, 0 until the trip has a max
     let unit: SpeedUnit
     let locationOff: Bool
+    /// The full screen width in points; FORM.md scales everything with it (390 pt is 1:1).
+    var screenWidth: CGFloat = 390
 
     private var dial: Dial { Dial(unit: unit) }
     private var findingGPS: Bool { state == .findingGPS }
@@ -26,7 +28,8 @@ struct DialView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let s = geo.size.width / 390
+            // Scales with the screen, but never wider than the room the screen's margins leave.
+            let s = min(screenWidth / 390, geo.size.width / Dial.size)
             ZStack(alignment: .topLeading) {
                 scale
                     .frame(width: Dial.size, height: Dial.size)

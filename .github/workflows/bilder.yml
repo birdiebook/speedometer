@@ -92,7 +92,7 @@ jobs:
           xcrun simctl ui "$UDID" appearance dark
           xcrun simctl privacy "$UDID" grant location "$BID" || true
           xcrun simctl location "$UDID" start --speed=7.5 --interval=1 37.3349,-122.0090 37.3449,-122.0090 || true
-          xcrun simctl launch "$UDID" "$BID" -AppleLanguages "(en)" -AppleLocale en_SE || true
+          xcrun simctl launch --stderr=/tmp/loc.txt "$UDID" "$BID" -AppleLanguages "(en)" -AppleLocale en_SE || true
           sleep 20
           xcrun simctl io "$UDID" screenshot "$OUT/real-moving.png" || true
           xcrun simctl location "$UDID" clear || true
@@ -118,6 +118,8 @@ jobs:
               echo "RÖTT: missing shots:$missing"
               ls "$OUT" 2>/dev/null || true
             fi
+            echo "== location samples seen by the app (DEBUG log)"
+            grep -o "LOC speed.*" /tmp/loc.txt 2>/dev/null | head -8 || true
           } > /tmp/resultat.txt
           cat /tmp/resultat.txt
           for i in 1 2 3 4 5; do

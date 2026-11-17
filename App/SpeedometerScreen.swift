@@ -14,7 +14,7 @@ struct SpeedometerScreen: View {
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
-                DialView(speed: speed, state: state, maxSpeed: trip.maxSpeed, unit: unit, locationOff: locationOff)
+                DialView(speed: speed, state: state, maxSpeed: trip.maxSpeed, unit: unit, locationOff: locationOff, screenWidth: geo.size.width)
                     .frame(maxHeight: .infinity)
                 Rectangle().fill(Theme.separator).frame(height: 1)
                     .padding(.top, 16)
