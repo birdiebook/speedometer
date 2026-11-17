@@ -43,3 +43,6 @@ Måtten ur skissen (BESLUT B5), för en skärm som är 390 punkter bred. Allt sk
   spärrad 3 pt, orange). Längst ner `Hold to reset`, 13 pt, etikettfärg. Max-markeringen står kvar.
 - **Finding GPS:** visare och nav i små strecks färg, siffran är `–` i dämpad färg, under enheten en prick och
   `FINDING GPS` i etikettfärg. Talen visar `0.0`, `0:00` och `–` för snittet.
+- **Location off** (E1): nekas eller begränsad platsåtkomst visar samma layout som finding GPS, men med `LOCATION OFF`
+  (12 pt, semibold, spärrad 3 pt, etikettfärg) under enheten i stället för pricken och `FINDING GPS`, och längst ner
+  länken `Allow location in Settings` (13 pt, orange) som öppnar appens inställningar.

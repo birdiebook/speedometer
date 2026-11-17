@@ -1,0 +1,71 @@
+# Runs SpeedKit's tests on Linux and parses App/ (BESLUT B4). No Mac and no phone needed: the logic lives in SpeedKit.
+name: tester
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  swift-test:
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check of App/ (swiftc -parse)
+        # SwiftUI does not exist on Linux, but a parser still finds missing braces and typos. The log is shared with
+        # the tests, so a parse error shows as RÖTT with its error lines in ci-resultat.
+        shell: bash
+        run: |
+          set -o pipefail
+          swiftc -parse -swift-version 5 App/*.swift 2>&1 | tee swift-release.log
+      - name: swift test (release)
+        shell: bash
+        run: |
+          set -o pipefail
+          swift test --package-path SpeedKit -c release -Xswiftc -enable-testing 2>&1 | tee -a swift-release.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swift-release
+          path: swift-release.log
+
+  metod-och-beslut:
+    # Every METOD Mn / BESLUT Bn in the code must exist in docs/.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/kolla_metod.py
+
+  resultat:
+    # Actions cannot be read from a local session without gh, so the summary goes on the branch ci-resultat:
+    # git fetch origin ci-resultat && git show origin/ci-resultat:resultat/<sha>.txt
+    needs: [swift-test, metod-och-beslut]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: loggar
+          merge-multiple: true
+      - name: Put the summary on ci-resultat
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "${GITHUB_SHA} ${GITHUB_REF_NAME} $(date -u +%FT%TZ) run ${GITHUB_RUN_ID}"
+            python3 tools/arbetssatt/ci_sammanfattning.py loggar/*.log || true
+            echo "== metod-och-beslut: ${{ needs.metod-och-beslut.result }}"
+          } > /tmp/resultat.txt
+          cat /tmp/resultat.txt
+          for i in 1 2 3 4 5; do
+            rm -rf /tmp/r && mkdir /tmp/r && cd /tmp/r && git init -q
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+            if git fetch -q origin ci-resultat 2>/dev/null; then git checkout -q -b ci-resultat FETCH_HEAD; else git checkout -q --orphan ci-resultat; fi
+            mkdir -p resultat && cp /tmp/resultat.txt "resultat/${GITHUB_SHA}.txt" && cp /tmp/resultat.txt senaste.txt
+            git add -A && git -c user.name=speedometer-ci -c user.email=speedometer-ci@users.noreply.github.com commit -qm "resultat ${GITHUB_SHA}"
+            git push -q origin ci-resultat && break
+            sleep $((i * 3))
+          done

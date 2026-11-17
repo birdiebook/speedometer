@@ -1,0 +1,43 @@
+# The Xcode project is generated from this file (XcodeGen) and is gitignored.
+name: Speedometer
+options:
+  bundleIdPrefix: se.birdiebook
+  # BESLUT B9: iOS 17.
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  SpeedKit:
+    path: SpeedKit
+targets:
+  Speedometer:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    dependencies:
+      - package: SpeedKit
+        product: SpeedKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: se.birdiebook.speedometer
+        MARKETING_VERSION: "0.1.0"
+        # Overwritten per build in E2.
+        CURRENT_PROJECT_VERSION: "1"
+        VERSIONING_SYSTEM: apple-generic
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Speedometer
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        # BESLUT B5: portrait only.
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # Without this every build stops at the export question in App Store Connect.
+        ITSAppUsesNonExemptEncryption: false
+        # BESLUT B3, B10: When In Use only, no background modes.
+        NSLocationWhenInUseUsageDescription: Speedometer uses your location to show your speed. It never leaves your phone.
+    scheme: {}

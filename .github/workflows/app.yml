@@ -1,0 +1,75 @@
+# Compiles the app for the simulator on macOS (free in a public repo, BESLUT B4) and puts GRÖNT or RÖTT with the
+# error lines on the branch ci-resultat as resultat/<sha>-app.txt. Nothing is run.
+name: app
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bygg:
+    runs-on: macos-15
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: XcodeGen (pinned version and checksum)
+        run: |
+          set -euo pipefail
+          curl -sSfL -o "$RUNNER_TEMP/xcodegen.zip" https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip
+          echo "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806  $RUNNER_TEMP/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/xcodegen/bin/xcodegen" generate
+      - name: Build the app (simulator)
+        shell: bash
+        run: |
+          set +e
+          xcodebuild build \
+            -project Speedometer.xcodeproj \
+            -scheme Speedometer \
+            -destination "generic/platform=iOS Simulator" \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO \
+            > /tmp/bygge.log 2>&1
+          echo $? > /tmp/kod.txt
+          set -e
+          # Each error line once, with the path from the repo root.
+          grep -E "error:" /tmp/bygge.log | sed "s#${GITHUB_WORKSPACE}/##" | sort -u | head -150 > /tmp/fel.txt || true
+          tail -3 /tmp/bygge.log
+          echo "code $(cat /tmp/kod.txt), $(wc -l < /tmp/fel.txt) error lines"
+      - name: Put the result on ci-resultat
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          kod=$(cat /tmp/kod.txt 2>/dev/null || echo 1)
+          {
+            echo "${GITHUB_SHA} ${GITHUB_REF_NAME} $(date -u +%FT%TZ) run ${GITHUB_RUN_ID}"
+            echo "== app (xcodebuild build, simulator)"
+            if [ "$kod" = "0" ]; then
+              echo "GRÖNT: the app compiles"
+            else
+              echo "RÖTT: the build failed (code $kod), $(wc -l < /tmp/fel.txt 2>/dev/null || echo 0) error lines"
+              cat /tmp/fel.txt 2>/dev/null || true
+              if [ ! -s /tmp/fel.txt ]; then tail -40 /tmp/bygge.log 2>/dev/null || true; fi
+            fi
+          } > /tmp/resultat.txt
+          cat /tmp/resultat.txt
+          for i in 1 2 3 4 5; do
+            rm -rf /tmp/r && mkdir /tmp/r && cd /tmp/r && git init -q
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+            if git fetch -q origin ci-resultat 2>/dev/null; then git checkout -q -b ci-resultat FETCH_HEAD; else git checkout -q --orphan ci-resultat; fi
+            mkdir -p resultat && cp /tmp/resultat.txt "resultat/${GITHUB_SHA}-app.txt"
+            git add -A && git -c user.name=speedometer-ci -c user.email=speedometer-ci@users.noreply.github.com commit -qm "app ${GITHUB_SHA}"
+            git push -q origin ci-resultat && break
+            sleep $((i * 3))
+          done
+      - name: Fail the job if the build failed
+        shell: bash
+        run: exit "$(cat /tmp/kod.txt)"
