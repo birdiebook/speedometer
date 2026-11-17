@@ -61,3 +61,17 @@ Omprövas: med fart på låsskärmen (Live Activity).
 
 Valt: SF Pro, med siffror av fast bredd, så att talen inte hoppar i sidled. Skissen använde Inter bara för att
 SF Pro inte finns på webben.
+
+## B12 — Ikonen är tavlan
+
+Valt: appikonen är visartavlan ur appen, förenklad så att den går att läsa i 60 px: svart botten, sju stora vita
+streck och sex små grå, en vit visare kring 37 på skalan som slutar innanför strecken, navet och den orange
+max-markeringen. Inga siffror. Ritas av `tools/ikon.py`, så att den går att ändra som kod.
+Bortvalt: siffror och alla små streck, som blir brus i liten storlek.
+
+## B13 — TestFlight i repots Actions
+
+Valt: `testflight.yml` bygger, signerar och laddar upp på GitHubs macOS-maskiner (BESLUT B4), samma väg som
+Idunns spegel. Den startas bara för hand från `main`, efter ägarens ja, och kräver grönt för samma commit i både
+testerna och appens bygge. Hemligheterna (App Store Connect-nyckeln och signeringsnyckeln) ligger bara i repots
+Actions-hemligheter och ges bara till stegen som behöver dem. Byggnumret är senaste TestFlight-bygget + 1.

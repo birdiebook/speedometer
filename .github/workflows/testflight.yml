@@ -1,0 +1,179 @@
+# BESLUT B13. Builds the app for the phone, signs it and uploads it to TestFlight on GitHub's macOS runners, which
+# are free for a public repo (BESLUT B4). Same path as the Idunn mirror's testflight.yml.
+#
+# Started only by hand ("Run workflow" or the API), after the owner's yes, and only from main. Never by push, tag or
+# pull request: that way no outsider reaches the secrets. The secrets are given only to the steps that need them.
+#
+# Requires green for the same commit: the tests (resultat/<sha>.txt) and the app build (resultat/<sha>-app.txt) on
+# branch ci-resultat. The outcome is written as resultat/<sha>-testflight.txt.
+#
+# Secrets (Settings -> Secrets and variables -> Actions):
+#   APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_PRIVATE_KEY (the whole .p8 file)
+#   CERTIFICATE_PRIVATE_KEY (the signing key, base64 of the pem file)
+name: testflight
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    if: github.repository == 'birdiebook/speedometer'
+    runs-on: macos-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - name: Only from main
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "FEL: TestFlight is built only from main, not from $GITHUB_REF." | tee /tmp/orsak.txt >&2; exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: The secrets exist
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
+        run: |
+          for n in APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_PRIVATE_KEY CERTIFICATE_PRIVATE_KEY; do
+            if [ -z "${!n}" ]; then echo "FEL: the secret $n is missing from the repo's Actions secrets." | tee /tmp/orsak.txt >&2; exit 1; fi
+          done
+          if ! printf '%s' "$APP_STORE_CONNECT_PRIVATE_KEY" | grep -q "BEGIN PRIVATE KEY"; then
+            echo "FEL: APP_STORE_CONNECT_PRIVATE_KEY is not the whole .p8 file (with the BEGIN and END lines)." | tee /tmp/orsak.txt >&2; exit 1
+          fi
+
+      - name: Tests and app build are green for this commit
+        run: |
+          set -euo pipefail
+          git fetch -q origin +ci-resultat:refs/remotes/origin/ci-resultat
+          for s in "" "-app"; do
+            FIL="resultat/${GITHUB_SHA}${s}.txt"
+            if ! RES=$(git show "origin/ci-resultat:${FIL}" 2>/dev/null); then
+              echo "FEL: ${FIL} is missing on ci-resultat. Wait for CI on ${GITHUB_SHA}." | tee /tmp/orsak.txt >&2; exit 1
+            fi
+            echo "$RES" | head -3
+            if echo "$RES" | grep -q "RÖTT" || ! echo "$RES" | grep -q "GRÖNT"; then
+              echo "FEL: ${FIL} is not green." | tee /tmp/orsak.txt >&2; exit 1
+            fi
+          done
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tools (pinned versions)
+        run: |
+          set -euo pipefail
+          curl -sSfL -o "$RUNNER_TEMP/xcodegen.zip" https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip
+          echo "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806  $RUNNER_TEMP/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+          pip install "codemagic-cli-tools==0.70.0"
+
+      - name: Generate the Xcode project
+        run: xcodegen generate
+
+      # The latest TestFlight build + 1, not the Actions counter. The app's Apple id is looked up from the bundle id.
+      - name: Set the build number
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          APPLE_ID=$(app-store-connect apps list \
+            --bundle-id-identifier se.birdiebook.speedometer --strict-match-identifier --json \
+            | python3 -c '
+          import json, sys
+          apps = json.load(sys.stdin)
+          if len(apps) != 1:
+              sys.exit(f"FEL: expected one app for se.birdiebook.speedometer in App Store Connect, got {len(apps)}")
+          print(apps[0]["id"])
+          ') || { echo "FEL: no app for se.birdiebook.speedometer in App Store Connect." > /tmp/orsak.txt; exit 1; }
+          SENASTE=$(app-store-connect get-latest-testflight-build-number "$APPLE_ID" 2>/dev/null || echo 0)
+          NYTT=$((SENASTE + 1))
+          echo "TestFlight: latest build $SENASTE, this one is $NYTT"
+          agvtool new-version -all "$NYTT"
+          echo "BYGGNUMMER=${NYTT}" >> "$GITHUB_ENV"
+
+      - name: Fetch signing
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          keychain initialize
+          echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > "$RUNNER_TEMP/cert_key.pem"
+          grep -q "BEGIN.*PRIVATE KEY" "$RUNNER_TEMP/cert_key.pem"
+          app-store-connect fetch-signing-files "se.birdiebook.speedometer" \
+            --type IOS_APP_STORE \
+            --certificate-key=@file:"$RUNNER_TEMP/cert_key.pem" \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: Archive
+        run: |
+          set -o pipefail
+          xcode-project build-ipa --project "Speedometer.xcodeproj" --scheme "Speedometer"
+
+      - name: Upload to TestFlight
+        # The internal test group has automatic distribution and gets the build by itself.
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: app-store-connect publish --path "build/ios/ipa/*.ipa"
+
+      - name: Clean up
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/cert_key.pem"
+          keychain use-login || true
+
+      - name: Write the outcome to ci-resultat
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "${GITHUB_SHA} ${GITHUB_REF_NAME} $(date -u +%FT%TZ) run ${GITHUB_RUN_ID}"
+            echo "== testflight (archive, signing, upload)"
+            if [ "${{ job.status }}" = "success" ]; then
+              echo "GRÖNT: build ${BYGGNUMMER:-?} uploaded to TestFlight"
+            else
+              echo "RÖTT: the build did not reach TestFlight (see run ${GITHUB_RUN_ID})"
+              # The reason when known (a missing secret's name, never a value).
+              cat /tmp/orsak.txt 2>/dev/null || true
+            fi
+          } > /tmp/resultat.txt
+          cat /tmp/resultat.txt
+          for i in 1 2 3 4 5; do
+            rm -rf /tmp/r && mkdir /tmp/r && cd /tmp/r && git init -q
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+            if git fetch -q origin ci-resultat 2>/dev/null; then git checkout -q -b ci-resultat FETCH_HEAD; else git checkout -q --orphan ci-resultat; fi
+            mkdir -p resultat && cp /tmp/resultat.txt "resultat/${GITHUB_SHA}-testflight.txt"
+            git add -A && git -c user.name=speedometer-ci -c user.email=speedometer-ci@users.noreply.github.com commit -qm "testflight ${GITHUB_SHA}"
+            git push -q origin ci-resultat && break
+            sleep $((i * 3))
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-logs
+          path: /tmp/xcodebuild_logs/*.log
+          if-no-files-found: ignore

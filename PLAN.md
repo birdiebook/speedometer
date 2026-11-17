@@ -1,6 +1,6 @@
 # Plan
 
-Bandet: **[E1 klar]** · E2 · E3
+Bandet: E1 klar · **[E2 pågår]** · E3
 
 ## E1 — Grunden
 
@@ -16,8 +16,8 @@ Klart när:
 ## E2 — Till telefonen
 
 - Ägaren: appen i App Store Connect (bundle-id `se.birdiebook.speedometer`) och hemligheterna i repots Actions.
-- Appikonen.
-- `testflight.yml` grönt och bygget på telefonen. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
+- Appikonen (klar, BESLUT B12).
+- `testflight.yml` (skrivet, BESLUT B13) grönt och bygget på telefonen. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
 
 ## E3 — Publiceringen
 
