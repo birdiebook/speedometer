@@ -1,6 +1,6 @@
 # Plan
 
-Bandet: **[E1 pågår]** · E2 · E3
+Bandet: **[E1 klar]** · E2 · E3
 
 ## E1 — Grunden
 
