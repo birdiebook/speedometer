@@ -1,0 +1,12 @@
+fe4a22d628ec56eae32cb33fd965f394d9299cfe claude/confident-brown-5m2w9y 2026-11-17T19:41:02Z run 44159707181
+== bilder (simulator screenshots)
+GRÖNT: every shot exists
+dark-finding.png
+dark-locationoff.png
+dark-paused.png
+dark-riding-mph.png
+dark-riding.png
+light-riding.png
+real-moving.png
+real-stopped.png
+== location samples seen by the app (DEBUG log)
