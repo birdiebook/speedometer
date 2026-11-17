@@ -8,6 +8,9 @@ Koden hänvisar med `// METOD Mn`. En konstant utan rad här är en bugg.
 `CLLocation.speed` i m/s; Apple anger ett negativt värde när farten är ogiltig. Ett prov används när farten är
 minst 0, `speedAccuracy` är minst 0 och högst **2 m/s**, och `horizontalAccuracy` är minst 0 och högst **30 m**.
 Status: Apples dokumentation för fälten (standard); gränserna är antaganden (30 m är samma gräns som Idunns pass ute).
+Simulatorn (`simctl location`) ger `speedAccuracy` −1 i varje prov, så den riktiga vägen visar finding GPS i
+provbilderna (mätt i `bilder.yml`). Apple anger att farten är ogiltig när `speedAccuracy` är negativ, så gränsen
+står kvar; den riktiga vägen prövas på telefonen.
 
 ## M2 — Utjämningen
 
