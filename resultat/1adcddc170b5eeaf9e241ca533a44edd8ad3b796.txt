@@ -1,8 +1,8 @@
-1adcddc170b5eeaf9e241ca533a44edd8ad3b796 claude/confident-brown-5m2w9y 2026-11-17T20:45:32Z run 44172516925
+1adcddc170b5eeaf9e241ca533a44edd8ad3b796 main 2026-11-17T20:45:44Z run 44172522527
 == swift-release
-GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 4 s
+GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 6 s
 Långsammast (av 27):
-      0.1 s  DialAndFormatTests.testDialAnglesImperial
+      0.0 s  DialAndFormatTests.testAverageFormat
       0.0 s  TripEngineTests.testTripCodableRoundTrip
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
