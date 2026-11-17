@@ -1,0 +1,133 @@
+# Draws the app in an iPhone simulator and puts the PNGs on the branch ci-resultat under bilder/<sha>/.
+# Demo shots use the DEBUG-only launch argument -demo; the real-path shots use simulated GPS. Never committed to
+# the work branch.
+name: bilder
+
+on:
+  push:
+    paths:
+      - "App/**"
+      - "SpeedKit/**"
+      - "project.yml"
+      - ".github/workflows/bilder.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: bilder-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bilder:
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      DD: /tmp/dd
+      OUT: /tmp/bilder
+      BID: se.birdiebook.speedometer
+    steps:
+      - uses: actions/checkout@v4
+      - name: XcodeGen (pinned version and checksum)
+        run: |
+          set -euo pipefail
+          curl -sSfL -o "$RUNNER_TEMP/xcodegen.zip" https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip
+          echo "4d9e34b62172d645eed6457cac13fc222569974098ef4ee9c3368bedf0196806  $RUNNER_TEMP/xcodegen.zip" | shasum -a 256 -c -
+          unzip -q "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/xcodegen/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/xcodegen/bin/xcodegen" generate
+      - name: Pick and boot a simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT"
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          c=[]
+          for rt,devs in d.items():
+              if "iOS" not in rt: continue
+              for x in devs:
+                  if x["name"].startswith("iPhone") and x.get("isAvailable",True):
+                      c.append((rt,x["name"],x["udid"]))
+          c.sort(key=lambda t:(("iPhone 16" == t[1]), "Pro" not in t[1] and "Plus" not in t[1] and "Max" not in t[1], t[0]), reverse=True)
+          print(c[0][2])
+          ')
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          echo "simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryLevel 100 --batteryState charged --cellularBars 4 --wifiBars 3
+      - name: Build Debug for the simulator
+        shell: bash
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Speedometer.xcodeproj \
+            -scheme Speedometer \
+            -destination "id=$UDID" \
+            -configuration Debug \
+            -derivedDataPath "$DD" \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -40
+      - name: Install and take the shots
+        shell: bash
+        run: |
+          set -uo pipefail
+          APP="$DD/Build/Products/Debug-iphonesimulator/Speedometer.app"
+          xcrun simctl install "$UDID" "$APP"
+          shot() { # name appearance locale demo
+            xcrun simctl ui "$UDID" appearance "$2"
+            xcrun simctl launch "$UDID" "$BID" -AppleLanguages "(en)" -AppleLocale "$3" -demo "$4" || true
+            sleep 3
+            xcrun simctl io "$UDID" screenshot "$OUT/$1.png" || true
+            xcrun simctl terminate "$UDID" "$BID" || true
+          }
+          shot dark-riding dark en_SE riding
+          shot dark-paused dark en_SE paused
+          shot dark-finding dark en_SE finding
+          shot dark-locationoff dark en_SE locationOff
+          shot light-riding light en_SE riding
+          shot dark-riding-mph dark en_US riding
+          # Real path: simulated GPS, no demo.
+          xcrun simctl ui "$UDID" appearance dark
+          xcrun simctl privacy "$UDID" grant location "$BID" || true
+          xcrun simctl location "$UDID" start --speed=7.5 --interval=1 37.3349,-122.0090 37.3449,-122.0090 || true
+          xcrun simctl launch "$UDID" "$BID" -AppleLanguages "(en)" -AppleLocale en_SE || true
+          sleep 20
+          xcrun simctl io "$UDID" screenshot "$OUT/real-moving.png" || true
+          xcrun simctl location "$UDID" clear || true
+          sleep 10
+          xcrun simctl io "$UDID" screenshot "$OUT/real-stopped.png" || true
+          xcrun simctl terminate "$UDID" "$BID" || true
+          ls -l "$OUT"
+      - name: Put the result on ci-resultat
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          want="dark-riding dark-paused dark-finding dark-locationoff light-riding dark-riding-mph real-moving real-stopped"
+          missing=""
+          for n in $want; do [ -s "$OUT/$n.png" ] || missing="$missing $n"; done
+          {
+            echo "${GITHUB_SHA} ${GITHUB_REF_NAME} $(date -u +%FT%TZ) run ${GITHUB_RUN_ID}"
+            echo "== bilder (simulator screenshots)"
+            if [ -z "$missing" ]; then
+              echo "GRÖNT: every shot exists"
+              ls "$OUT"
+            else
+              echo "RÖTT: missing shots:$missing"
+              ls "$OUT" 2>/dev/null || true
+            fi
+          } > /tmp/resultat.txt
+          cat /tmp/resultat.txt
+          for i in 1 2 3 4 5; do
+            rm -rf /tmp/r && mkdir /tmp/r && cd /tmp/r && git init -q
+            git remote add origin "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+            if git fetch -q origin ci-resultat 2>/dev/null; then git checkout -q -b ci-resultat FETCH_HEAD; else git checkout -q --orphan ci-resultat; fi
+            mkdir -p resultat "bilder/${GITHUB_SHA}" && cp /tmp/resultat.txt "resultat/${GITHUB_SHA}-bilder.txt"
+            cp "$OUT"/*.png "bilder/${GITHUB_SHA}/" 2>/dev/null || true
+            git add -A && git -c user.name=speedometer-ci -c user.email=speedometer-ci@users.noreply.github.com commit -qm "bilder ${GITHUB_SHA}"
+            git push -q origin ci-resultat && break
+            sleep $((i * 3))
+          done
+          [ -z "$missing" ]

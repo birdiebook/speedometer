@@ -8,8 +8,11 @@ struct SpeedometerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store)
+            root
                 .onChange(of: scenePhase, initial: true) { _, phase in
+                    #if DEBUG
+                    if DemoMode.name != nil { return } // demo: no store, no location
+                    #endif
                     let active = phase == .active
                     // BESLUT B6: the screen stays on while the app is open.
                     UIApplication.shared.isIdleTimerDisabled = active
@@ -17,5 +20,18 @@ struct SpeedometerApp: App {
                     if active { store.activate() } else { store.deactivate() }
                 }
         }
+    }
+
+    @ViewBuilder
+    private var root: some View {
+        #if DEBUG
+        if let demo = DemoMode.name {
+            DemoView(name: demo)
+        } else {
+            ContentView(store: store)
+        }
+        #else
+        ContentView(store: store)
+        #endif
     }
 }
