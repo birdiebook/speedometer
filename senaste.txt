@@ -1,21 +1,21 @@
-155f86d0b466113f6418e9339a8de889e3373581 main 2026-11-17T22:19:59Z run 44188854459
+edd67d5ad083dcf345f45a523873a032b3f97758 main 2026-11-17T22:32:52Z run 44190969661
 == swift-release
-GRÖNT: 31 test, 0 fel, 0 s i testerna, bygget 6 s
+GRÖNT: 31 test, 0 fel, 0 s i testerna, bygget 5 s
 Långsammast (av 31):
-      0.1 s  TripEngineTests.testAverageSpeed
-      0.1 s  TripEngineTests.testAutoPauseAfterThreeSecondsBelowThreshold
-      0.1 s  DialAndFormatTests.testUnitConversions
-      0.0 s  TripEngineTests.testShortDipDoesNotPause
+      0.1 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
+      0.1 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
+      0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
       0.0 s  TripEngineTests.testTripCodableRoundTrip
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
-      0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
-      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
-      0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
+      0.0 s  TripEngineTests.testShortDipDoesNotPause
       0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
       0.0 s  TripEngineTests.testResumesAtOnePointFour
       0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
       0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
       0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
       0.0 s  TripEngineTests.testNothingCountsWhilePaused
+      0.0 s  TripEngineTests.testNoPositionForFiveSecondsMeansFindingGPS
+      0.0 s  TripEngineTests.testMaxUsesTheSmoothedSpeedSoASpikeDoesNotStick
+      0.0 s  TripEngineTests.testLimitsAreInclusive
 
 == metod-och-beslut: success
