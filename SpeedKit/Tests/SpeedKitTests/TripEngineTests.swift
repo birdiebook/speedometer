@@ -16,22 +16,34 @@ final class TripEngineTests: XCTestCase {
 
     // MARK: M1
 
-    func testInvalidSamplesAreIgnored() {
+    func testSamplesWithoutAPositionAreIgnored() {
         var e = TripEngine()
-        e.ingest(GPSSample(time: 0, speed: -1, speedAccuracy: 0.5, horizontalAccuracy: 5))
-        e.ingest(GPSSample(time: 1, speed: 5, speedAccuracy: 2.5, horizontalAccuracy: 5))
-        e.ingest(GPSSample(time: 2, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 31))
-        e.ingest(GPSSample(time: 3, speed: 5, speedAccuracy: -1, horizontalAccuracy: 5))
-        e.ingest(GPSSample(time: 4, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: -1))
+        e.ingest(GPSSample(time: 0, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: -1))
+        e.ingest(GPSSample(time: 1, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 150))
         XCTAssertEqual(e.state, .findingGPS)
         XCTAssertNil(e.displayedSpeed)
         XCTAssertEqual(e.trip, Trip())
     }
 
+    func testAPositionWithoutSpeedIsAStopNotMissingGPS() {
+        // Indoors or standing still: iOS gives a position but speed -1.
+        var e = TripEngine()
+        e.ingest(GPSSample(time: 0, speed: -1, speedAccuracy: -1, horizontalAccuracy: 40))
+        XCTAssertEqual(e.state, .paused)
+        XCTAssertEqual(e.displayedSpeed!, 0, accuracy: 1e-9)
+        e.ingest(GPSSample(time: 1, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 50)) // speed, but too vague
+        e.ingest(GPSSample(time: 2, speed: 5, speedAccuracy: 4, horizontalAccuracy: 5))    // speed accuracy too poor
+        XCTAssertEqual(e.state, .paused)
+        XCTAssertEqual(e.trip, Trip())
+    }
+
     func testLimitsAreInclusive() {
-        XCTAssertTrue(GPSSample(time: 0, speed: 0, speedAccuracy: 2, horizontalAccuracy: 30).isValid)
-        XCTAssertFalse(GPSSample(time: 0, speed: 0, speedAccuracy: 2.01, horizontalAccuracy: 30).isValid)
-        XCTAssertFalse(GPSSample(time: 0, speed: 0, speedAccuracy: 2, horizontalAccuracy: 30.01).isValid)
+        XCTAssertTrue(GPSSample(time: 0, speed: 0, speedAccuracy: 3, horizontalAccuracy: 30).isValid)
+        XCTAssertFalse(GPSSample(time: 0, speed: 0, speedAccuracy: 3.01, horizontalAccuracy: 30).isValid)
+        XCTAssertFalse(GPSSample(time: 0, speed: 0, speedAccuracy: 3, horizontalAccuracy: 30.01).isValid)
+        XCTAssertFalse(GPSSample(time: 0, speed: -1, speedAccuracy: 0.5, horizontalAccuracy: 5).isValid)
+        XCTAssertTrue(GPSSample(time: 0, speed: -1, speedAccuracy: -1, horizontalAccuracy: 100).hasFix)
+        XCTAssertFalse(GPSSample(time: 0, speed: -1, speedAccuracy: -1, horizontalAccuracy: 100.01).hasFix)
     }
 
     // MARK: M2
@@ -96,15 +108,45 @@ final class TripEngineTests: XCTestCase {
         XCTAssertEqual(e.state, .riding)
     }
 
-    func testNoValidSampleForFiveSecondsMeansFindingGPS() {
-        var e = riding(at: 5) // last valid at t = 10
+    func testNoPositionForFiveSecondsMeansFindingGPS() {
+        var e = riding(at: 5) // last position at t = 10
         e.tick(now: 14.9)
         XCTAssertEqual(e.state, .riding)
-        e.ingest(GPSSample(time: 13, speed: 5, speedAccuracy: 9, horizontalAccuracy: 5)) // invalid, no refresh
+        e.ingest(GPSSample(time: 13, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 150)) // no position, no refresh
         e.tick(now: 15)
         XCTAssertEqual(e.state, .findingGPS)
         XCTAssertNil(e.displayedSpeed)
         XCTAssertEqual(e.trip.movingTime, 10, accuracy: 1e-9, "the trip is kept")
+    }
+
+    func testAPositionWithoutSpeedKeepsTheGPSAlive() {
+        var e = TripEngine()
+        e.ingest(GPSSample(time: 0, speed: -1, speedAccuracy: -1, horizontalAccuracy: 20))
+        e.ingest(GPSSample(time: 4, speed: -1, speedAccuracy: -1, horizontalAccuracy: 20))
+        e.tick(now: 8)
+        XCTAssertEqual(e.state, .paused)
+        e.tick(now: 9)
+        XCTAssertEqual(e.state, .findingGPS)
+    }
+
+    func testAShortSpeedDropoutWhileRidingHoldsTheSpeed() {
+        var e = riding(at: 5) // last speed at t = 10
+        e.ingest(GPSSample(time: 11, speed: -1, speedAccuracy: -1, horizontalAccuracy: 10))
+        e.ingest(GPSSample(time: 12.9, speed: -1, speedAccuracy: -1, horizontalAccuracy: 10))
+        XCTAssertEqual(e.state, .riding)
+        XCTAssertEqual(e.displayedSpeed!, 5, accuracy: 1e-9)
+        e.ingest(good(13.5, 5)) // back: the 3.5 s step counts as 3 s
+        XCTAssertEqual(e.trip.distance, 50 + 15, accuracy: 1e-9)
+    }
+
+    func testThreeSecondsWithoutSpeedWhileRidingPauses() {
+        var e = riding(at: 5)
+        let before = e.trip
+        e.ingest(GPSSample(time: 13, speed: -1, speedAccuracy: -1, horizontalAccuracy: 10))
+        XCTAssertEqual(e.state, .paused)
+        XCTAssertEqual(e.displayedSpeed!, 0, accuracy: 1e-9)
+        e.ingest(good(20, 0.5))
+        XCTAssertEqual(e.trip, before, "no distance for the gap")
     }
 
     func testRecoversFromFindingGPSWithoutAddingTheGap() {

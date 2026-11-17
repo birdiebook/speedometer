@@ -3,14 +3,17 @@
 Varje mätning, algoritm och konstant, med källa och källans status: mätt · standard · forskning · antagande.
 Koden hänvisar med `// METOD Mn`. En konstant utan rad här är en bugg.
 
-## M1 — Farten ur GPS
+## M1 — Positionen och farten ur GPS
 
-`CLLocation.speed` i m/s; Apple anger ett negativt värde när farten är ogiltig. Ett prov används när farten är
-minst 0, `speedAccuracy` är minst 0 och högst **2 m/s**, och `horizontalAccuracy` är minst 0 och högst **30 m**.
-Status: Apples dokumentation för fälten (standard); gränserna är antaganden (30 m är samma gräns som Idunns pass ute).
-Simulatorn (`simctl location`) ger `speedAccuracy` −1 i varje prov, så den riktiga vägen visar finding GPS i
-provbilderna (mätt i `bilder.yml`). Apple anger att farten är ogiltig när `speedAccuracy` är negativ, så gränsen
-står kvar; den riktiga vägen prövas på telefonen.
+Två nivåer. **Position:** `horizontalAccuracy` är minst 0 och högst **100 m**; då vet telefonen var den är, även
+inomhus på wifi. **Giltig fart:** `CLLocation.speed` (m/s) är minst 0, `speedAccuracy` är minst 0 och högst
+**3 m/s**, och `horizontalAccuracy` är högst **30 m**. Apple anger att farten är ogiltig när `speed` eller
+`speedAccuracy` är negativ. Bara giltig fart räknas in i sträcka, tid och max.
+Status: Apples dokumentation för fälten (standard); gränserna är antaganden.
+Mätt 2026-11-17, första bygget på telefonen: inomhus och stilla gav iOS position men ingen giltig fart, och
+appen stod kvar på finding GPS fast GPS fungerade. Därför de två nivåerna; gränsen för fartens noggrannhet höjdes
+samtidigt från 2 till 3 m/s, så att en sämre men användbar fart inte pausar turen mitt i farten. Simulatorn
+(`simctl location`) ger `speedAccuracy` −1 i varje prov, så den riktiga vägen prövas på telefonen.
 
 ## M2 — Utjämningen
 
@@ -20,9 +23,10 @@ Den visade farten jämnas ut exponentiellt med tidskonstanten **τ = 1,0 s**: `v
 ## M3 — Autopausen
 
 Turen pausar när den utjämnade farten varit under **0,8 m/s** (2,9 km/h) i **3 s**, och fortsätter när den
-når **1,4 m/s** (5 km/h). Glappet mellan gränserna hindrar att den slår fram och tillbaka vid låg fart. Kommer
-inget giltigt prov på **5 s** räknas det som att GPS saknas: farten visas inte och turen står still.
-Status: antagande.
+når **1,4 m/s** (5 km/h). Glappet mellan gränserna hindrar att den slår fram och tillbaka vid låg fart.
+En position utan giltig fart (M1) betyder stillastående: turen pausar med visaren på 0. Under färd hålls farten
+kvar i upp till **3 s** utan giltig fart (ett kort avbrott), sedan pausar turen. Kommer ingen position alls på
+**5 s** räknas det som att GPS saknas: farten visas inte och turen står still. Status: antagande.
 
 ## M4 — Sträckan och tiden
 

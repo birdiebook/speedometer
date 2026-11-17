@@ -19,10 +19,17 @@ public struct GPSSample: Equatable {
     }
 
     // METOD M1: limits for a usable sample.
-    public static let maxSpeedAccuracy: Double = 2      // m/s
-    public static let maxHorizontalAccuracy: Double = 30 // m
+    public static let maxSpeedAccuracy: Double = 3       // m/s
+    public static let maxHorizontalAccuracy: Double = 30 // m, for a valid speed
+    public static let maxFixAccuracy: Double = 100       // m, for knowing where we are at all
 
-    /// METOD M1: speed >= 0, 0 <= speedAccuracy <= 2 m/s, 0 <= horizontalAccuracy <= 30 m.
+    /// METOD M1: the phone knows where it is: 0 <= horizontalAccuracy <= 100 m. Indoors and when standing
+    /// still, iOS gives a position like this but often no speed.
+    public var hasFix: Bool {
+        horizontalAccuracy >= 0 && horizontalAccuracy <= GPSSample.maxFixAccuracy
+    }
+
+    /// METOD M1: a valid speed: speed >= 0, 0 <= speedAccuracy <= 3 m/s, 0 <= horizontalAccuracy <= 30 m.
     public var isValid: Bool {
         speed >= 0
             && speedAccuracy >= 0 && speedAccuracy <= GPSSample.maxSpeedAccuracy

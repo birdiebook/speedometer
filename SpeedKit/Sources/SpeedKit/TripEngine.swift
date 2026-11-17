@@ -8,7 +8,7 @@ public struct TripEngine {
     public static let pauseSpeed: Double = 0.8
     public static let pauseAfter: TimeInterval = 3
     public static let resumeSpeed: Double = 1.4
-    // METOD M3: no valid sample for this long means no GPS.
+    // METOD M3: no position for this long means no GPS.
     public static let noFixTimeout: TimeInterval = 5
     // METOD M4: longest interval counted for distance and time.
     public static let maxStep: TimeInterval = 3
@@ -17,7 +17,10 @@ public struct TripEngine {
     public private(set) var trip: Trip
 
     private var smoothed: Double?
-    private var lastValidTime: TimeInterval?
+    /// METOD M3: the last sample with a position (for the 5 s no-GPS timeout).
+    private var lastFixTime: TimeInterval?
+    /// METOD M4: the last sample with a valid speed (for the step and for "speed unknown").
+    private var lastSpeedTime: TimeInterval?
     private var belowSince: TimeInterval?
 
     /// A restored trip keeps its numbers but starts in findingGPS (BESLUT B10).
@@ -36,14 +39,30 @@ public struct TripEngine {
     }
 
     public mutating func ingest(_ sample: GPSSample) {
-        guard sample.isValid else { return } // METOD M1
+        guard sample.hasFix else { return } // METOD M1
+        lastFixTime = sample.time
+
+        // METOD M3: a position without a valid speed. Indoors and when standing still iOS often gives no speed:
+        // that is a stop, not a missing GPS. While riding the speed is held for up to 3 s (a short dropout),
+        // then the trip pauses with the needle at 0.
+        guard sample.isValid else {
+            switch state {
+            case .findingGPS:
+                stop()
+            case .riding:
+                if let last = lastSpeedTime, sample.time - last >= TripEngine.pauseAfter { stop() }
+            case .paused:
+                break
+            }
+            return
+        }
 
         // METOD M4: delta capped at 3 s; the first sample after a gap has no delta.
         var dt: Double = 0
-        if let last = lastValidTime {
+        if let last = lastSpeedTime {
             dt = min(max(sample.time - last, 0), TripEngine.maxStep)
         }
-        lastValidTime = sample.time
+        lastSpeedTime = sample.time
 
         // METOD M2: exponential smoothing; the first sample after a gap starts from the raw value.
         let v: Double
@@ -87,13 +106,22 @@ public struct TripEngine {
         }
     }
 
-    /// METOD M3: call about once a second. No valid sample for 5 s means no GPS.
+    /// METOD M3: paused with the needle at 0; the next valid speed starts a new step (no distance for the gap).
+    private mutating func stop() {
+        state = .paused
+        smoothed = 0
+        lastSpeedTime = nil
+        belowSince = nil
+    }
+
+    /// METOD M3: call about once a second. No position for 5 s means no GPS.
     public mutating func tick(now: TimeInterval) {
-        guard state != .findingGPS, let last = lastValidTime else { return }
+        guard state != .findingGPS, let last = lastFixTime else { return }
         if now - last >= TripEngine.noFixTimeout {
             state = .findingGPS
             smoothed = nil
-            lastValidTime = nil
+            lastFixTime = nil
+            lastSpeedTime = nil
             belowSince = nil
         }
     }
