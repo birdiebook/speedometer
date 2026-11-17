@@ -27,3 +27,8 @@ Klart när:
 
 - Farten på låsskärmen och i Dynamic Island (Live Activity), som kräver plats i bakgrunden (BESLUT B10).
 - Samma teknik i Idunn för puls mot fart (BESLUT B1).
+- Uppläsning av ny toppfart (ägarens idé 2026-11-17). Telefonens egen röst, inget nät. Läser toppen när farten
+  slutat stiga i ett par sekunder ("Top speed 42"), högst var 30:e sekund och bara när max ökat minst 1 km/h sedan
+  förra uppläsningen. Musik sänks medan rösten talar. Av från början; en liten högtalarikon slår på och av, det första
+  undantaget från BESLUT B6 och ett eget beslut när den byggs. Byggs tillsammans med låsskärmen, eftersom båda kräver
+  plats i bakgrunden. Efter första provturen.
