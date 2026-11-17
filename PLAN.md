@@ -17,7 +17,8 @@ Klart när:
 
 - Ägaren: appen i App Store Connect (bundle-id `se.birdiebook.speedometer`) och hemligheterna i repots Actions.
 - Appikonen (klar, BESLUT B12).
-- `testflight.yml` grönt (BESLUT B13): bygge 1 uppladdat 2026-11-17, första försöket. Kvar: bygget på telefonen. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
+- `testflight.yml` grönt (BESLUT B13): bygge 1 uppladdat 2026-11-17, första försöket; bygge 2 samma kväll med rättelsen i METOD M1 och M3 (position utan fart
+  är stillastående). Kvar: provtur på cykeln. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
 
 ## E3 — Publiceringen
 
