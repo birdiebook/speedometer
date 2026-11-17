@@ -1,0 +1,21 @@
+f9037cee4634bf7a35c92c30211dd7826de3275c claude/confident-brown-5m2w9y 2026-11-17T22:51:09Z run 44193869810
+== swift-release
+GRÖNT: 32 test, 0 fel, 0 s i testerna, bygget 6 s
+Långsammast (av 32):
+      0.0 s  DialAndFormatTests.testAverageFormat
+      0.0 s  TripEngineTests.testTripCodableRoundTrip
+      0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
+      0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
+      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
+      0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
+      0.0 s  TripEngineTests.testShortDipDoesNotPause
+      0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
+      0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
+      0.0 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
+      0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
+      0.0 s  TripEngineTests.testNothingCountsWhilePaused
+      0.0 s  TripEngineTests.testMaxUsesTheSmoothedSpeedSoASpikeDoesNotStick
+
+== metod-och-beslut: success
