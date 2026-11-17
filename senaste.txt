@@ -1,15 +1,13 @@
-264a0895484b821dfa05bf4dc564b3b387d2431f main 2026-11-17T21:49:17Z run 44183634156
+264a0895484b821dfa05bf4dc564b3b387d2431f claude/confident-brown-5m2w9y 2026-11-17T21:49:21Z run 44183631498
 == swift-release
-GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 6 s
+GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 5 s
 Långsammast (av 27):
-      0.2 s  TripEngineTests.testTripCodableRoundTrip
-      0.1 s  DialAndFormatTests.testDialAnglesImperial
-      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
-      0.0 s  DialAndFormatTests.testAverageFormat
+      0.1 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testTripCodableRoundTrip
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
+      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
       0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
       0.0 s  TripEngineTests.testShortDipDoesNotPause
-      0.0 s  TripEngineTests.testResumesAtOnePointFour
       0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
       0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
       0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
@@ -17,5 +15,7 @@ Långsammast (av 27):
       0.0 s  TripEngineTests.testNoValidSampleForFiveSecondsMeansFindingGPS
       0.0 s  TripEngineTests.testMaxUsesTheSmoothedSpeedSoASpikeDoesNotStick
       0.0 s  TripEngineTests.testLimitsAreInclusive
+      0.0 s  TripEngineTests.testInvalidSamplesAreIgnored
+      0.0 s  TripEngineTests.testFirstSampleStartsFromTheRawSpeed
 
 == metod-och-beslut: success
