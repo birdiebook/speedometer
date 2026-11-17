@@ -75,3 +75,11 @@ Valt: `testflight.yml` bygger, signerar och laddar upp på GitHubs macOS-maskine
 Idunns spegel. Den startas bara för hand från `main`, efter ägarens ja, och kräver grönt för samma commit i både
 testerna och appens bygge. Hemligheterna (App Store Connect-nyckeln och signeringsnyckeln) ligger bara i repots
 Actions-hemligheter och ges bara till stegen som behöver dem. Byggnumret är senaste TestFlight-bygget + 1.
+
+## B14 — Allt utöver mätaren bakom en meny
+
+Valt (ägaren 2026-11-17): det som kommer utöver mätaren, med uppläsningen av toppfart som första, samlas bakom en
+hamburgarmeny: en diskret ikon i ett hörn som öppnar ett blad. Mätarskärmen förblir ren hur mycket som än läggs
+till, och ingen ny knapp behövs per funktion. Ikonen läggs till först när menyn har något i sig; en tom meny byggs
+inte. Ett kort tryck öppnar menyn, så den krockar inte med håll-in för att nollställa (BESLUT B6).
+Bortvalt: en egen ikon per funktion på mätarskärmen, och inställningar i iOS Inställningar-app (för gömt).
