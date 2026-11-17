@@ -1,0 +1,19 @@
+31f50c9270ce0639b0f7229a946034782c32ce53 main 2026-11-17T20:40:53Z run 44170305858
+== bilder (simulator screenshots)
+GRÖNT: every shot exists
+dark-finding.png
+dark-locationoff.png
+dark-paused.png
+dark-riding-mph.png
+dark-riding.png
+light-riding.png
+real-moving.png
+real-stopped.png
+== location samples seen by the app (DEBUG log)
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+LOC speed=7.50 speedAcc=-1.00 hAcc=5.0
+stderr bytes: none, log bytes:     1065
