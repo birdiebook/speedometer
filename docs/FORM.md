@@ -40,7 +40,8 @@ Måtten ur skissen (BESLUT B5), för en skärm som är 390 punkter bred. Allt sk
 
 - **Riding:** som ovan.
 - **Paused:** visaren står på 0, den digitala siffran i dämpad färg, under enheten `PAUSED` (12 pt, semibold,
-  spärrad 3 pt, orange). Längst ner `Hold to reset`, 13 pt, etikettfärg. Max-markeringen står kvar.
+  spärrad 3 pt, orange). Längst ner `Hold to reset`, 13 pt, etikettfärg. Max-markeringen står kvar. Är turen tom (ny eller
+  nollställd) visas enheten i stället för `PAUSED` och ingen `Hold to reset` (BESLUT B15).
 - **Finding GPS:** visare och nav i små strecks färg, siffran är `–` i dämpad färg, under enheten en prick och
   `FINDING GPS` i etikettfärg. Talen visar `0.0`, `0:00` och `–` för snittet.
 - **Location off** (E1): nekas eller begränsad platsåtkomst visar samma layout som finding GPS, men med `LOCATION OFF`

@@ -108,24 +108,30 @@ final class TripEngineTests: XCTestCase {
         XCTAssertEqual(e.state, .riding)
     }
 
-    func testNoPositionForFiveSecondsMeansFindingGPS() {
-        var e = riding(at: 5) // last position at t = 10
-        e.tick(now: 14.9)
+    func testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen() {
+        var e = riding(at: 5) // last position and speed at t = 10
+        e.tick(now: 12.9)
         XCTAssertEqual(e.state, .riding)
-        e.ingest(GPSSample(time: 13, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 150)) // no position, no refresh
-        e.tick(now: 15)
+        e.tick(now: 13) // a tunnel: no samples at all
+        XCTAssertEqual(e.state, .paused)
+        XCTAssertEqual(e.displayedSpeed!, 0, accuracy: 1e-9)
+        e.ingest(GPSSample(time: 20, speed: 5, speedAccuracy: 0.5, horizontalAccuracy: 150)) // no position, no refresh
+        e.tick(now: 24.9)
+        XCTAssertEqual(e.state, .paused)
+        e.tick(now: 25)
         XCTAssertEqual(e.state, .findingGPS)
         XCTAssertNil(e.displayedSpeed)
         XCTAssertEqual(e.trip.movingTime, 10, accuracy: 1e-9, "the trip is kept")
     }
 
     func testAPositionWithoutSpeedKeepsTheGPSAlive() {
+        // Indoors iOS sends positions sparsely; gaps under 15 s must not flicker to finding GPS.
         var e = TripEngine()
         e.ingest(GPSSample(time: 0, speed: -1, speedAccuracy: -1, horizontalAccuracy: 20))
-        e.ingest(GPSSample(time: 4, speed: -1, speedAccuracy: -1, horizontalAccuracy: 20))
-        e.tick(now: 8)
+        e.ingest(GPSSample(time: 10, speed: -1, speedAccuracy: -1, horizontalAccuracy: 20))
+        e.tick(now: 24.9)
         XCTAssertEqual(e.state, .paused)
-        e.tick(now: 9)
+        e.tick(now: 25)
         XCTAssertEqual(e.state, .findingGPS)
     }
 
@@ -152,7 +158,7 @@ final class TripEngineTests: XCTestCase {
     func testRecoversFromFindingGPSWithoutAddingTheGap() {
         var e = riding(at: 5)
         let before = e.trip
-        e.tick(now: 20)
+        e.tick(now: 25)
         XCTAssertEqual(e.state, .findingGPS)
         e.ingest(good(30, 6))
         XCTAssertEqual(e.state, .riding)
@@ -188,6 +194,15 @@ final class TripEngineTests: XCTestCase {
         for t in 1...10 { e.ingest(good(Double(t), 0.5)) }
         XCTAssertEqual(e.state, .paused)
         XCTAssertEqual(e.trip, Trip())
+    }
+
+    func testEmptyTrip() {
+        XCTAssertTrue(Trip().isEmpty)
+        XCTAssertFalse(Trip(maxSpeed: 2).isEmpty)
+        var e = riding(at: 5)
+        XCTAssertFalse(e.trip.isEmpty)
+        e.reset()
+        XCTAssertTrue(e.trip.isEmpty)
     }
 
     func testAverageSpeed() {

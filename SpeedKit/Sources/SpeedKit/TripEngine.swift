@@ -9,7 +9,7 @@ public struct TripEngine {
     public static let pauseAfter: TimeInterval = 3
     public static let resumeSpeed: Double = 1.4
     // METOD M3: no position for this long means no GPS.
-    public static let noFixTimeout: TimeInterval = 5
+    public static let noFixTimeout: TimeInterval = 15
     // METOD M4: longest interval counted for distance and time.
     public static let maxStep: TimeInterval = 3
 
@@ -114,9 +114,13 @@ public struct TripEngine {
         belowSince = nil
     }
 
-    /// METOD M3: call about once a second. No position for 5 s means no GPS.
+    /// METOD M3: call about once a second. Riding without a valid speed for 3 s pauses, whether positions
+    /// arrive or not (a tunnel); no position for 15 s means no GPS.
     public mutating func tick(now: TimeInterval) {
         guard state != .findingGPS, let last = lastFixTime else { return }
+        if state == .riding, let lastSpeed = lastSpeedTime, now - lastSpeed >= TripEngine.pauseAfter {
+            stop()
+        }
         if now - last >= TripEngine.noFixTimeout {
             state = .findingGPS
             smoothed = nil

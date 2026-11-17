@@ -19,6 +19,11 @@ public struct Trip: Codable, Equatable {
     public var averageSpeed: Double? {
         movingTime > 0 ? distance / movingTime : nil
     }
+
+    /// BESLUT B15: nothing ridden yet (a new or reset trip). The screen shows no PAUSED then.
+    public var isEmpty: Bool {
+        distance == 0 && movingTime == 0 && maxSpeed == 0
+    }
 }
 
 /// BESLUT B5: the three modes of the screen.

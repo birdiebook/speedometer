@@ -84,3 +84,9 @@ hamburgarmeny: en diskret ikon i ett hörn som öppnar ett blad. Mätarskärmen 
 till, och ingen ny knapp behövs per funktion. Ikonen läggs till först när menyn har något i sig; en tom meny byggs
 inte. Ett kort tryck öppnar menyn, så den krockar inte med håll-in för att nollställa (BESLUT B6).
 Bortvalt: en egen ikon per funktion på mätarskärmen, och inställningar i iOS Inställningar-app (för gömt).
+
+## B15 — Ingen PAUSED före första turen
+
+Valt (2026-11-17, efter bygge 2): när turen är tom (ny eller nollställd) visar skärmen bara 0 och enheten, utan
+PAUSED och utan "Hold to reset". Orden syns först när det finns en tur som står still. Skäl: appen visade PAUSED
+direkt när den öppnades, innan något cyklats, och det väckte frågan vad som var pausat.

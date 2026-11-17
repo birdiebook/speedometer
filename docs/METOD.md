@@ -25,8 +25,10 @@ Den visade farten jämnas ut exponentiellt med tidskonstanten **τ = 1,0 s**: `v
 Turen pausar när den utjämnade farten varit under **0,8 m/s** (2,9 km/h) i **3 s**, och fortsätter när den
 når **1,4 m/s** (5 km/h). Glappet mellan gränserna hindrar att den slår fram och tillbaka vid låg fart.
 En position utan giltig fart (M1) betyder stillastående: turen pausar med visaren på 0. Under färd hålls farten
-kvar i upp till **3 s** utan giltig fart (ett kort avbrott), sedan pausar turen. Kommer ingen position alls på
-**5 s** räknas det som att GPS saknas: farten visas inte och turen står still. Status: antagande.
+kvar i upp till **3 s** utan giltig fart (ett kort avbrott), sedan pausar turen, även om inga positioner kommer
+alls (en tunnel). Kommer ingen position på **15 s** räknas det som att GPS saknas: farten visas inte och turen
+står still. Status: antagande. Mätt 2026-11-17 med bygge 2: inomhus kom positionerna glest, och med 5 s växlade
+skärmen mellan paused och finding GPS; därför 15 s.
 
 ## M4 — Sträckan och tiden
 

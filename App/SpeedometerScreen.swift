@@ -14,7 +14,8 @@ struct SpeedometerScreen: View {
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
-                DialView(speed: speed, state: state, maxSpeed: trip.maxSpeed, unit: unit, locationOff: locationOff, screenWidth: geo.size.width)
+                DialView(speed: speed, state: state, maxSpeed: trip.maxSpeed, unit: unit, locationOff: locationOff,
+                         screenWidth: geo.size.width, tripStarted: !trip.isEmpty)
                     .frame(maxHeight: .infinity)
                 Rectangle().fill(Theme.separator).frame(height: 1)
                     .padding(.top, 16)
@@ -69,7 +70,7 @@ struct SpeedometerScreen: View {
             Link("Allow location in Settings", destination: url)
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.accent)
-        } else if state == .paused {
+        } else if state == .paused && !trip.isEmpty { // BESLUT B15
             Text("Hold to reset")
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.label)

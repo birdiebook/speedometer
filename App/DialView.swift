@@ -11,6 +11,8 @@ struct DialView: View {
     let locationOff: Bool
     /// The full screen width in points; FORM.md scales everything with it (390 pt is 1:1).
     var screenWidth: CGFloat = 390
+    /// BESLUT B15: PAUSED only once something has been ridden; a new or reset trip shows the unit instead.
+    var tripStarted: Bool = true
 
     private var dial: Dial { Dial(unit: unit) }
     private var findingGPS: Bool { state == .findingGPS }
@@ -140,7 +142,7 @@ struct DialView: View {
                     .font(.system(size: 12, weight: .medium)).tracking(3)
                     .foregroundStyle(Theme.label)
             }
-        } else if paused {
+        } else if paused && tripStarted {
             Text("PAUSED")
                 .font(.system(size: 12, weight: .semibold)).tracking(3)
                 .foregroundStyle(Theme.accent)
