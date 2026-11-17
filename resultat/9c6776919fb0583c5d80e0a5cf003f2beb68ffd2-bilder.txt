@@ -1,0 +1,11 @@
+9c6776919fb0583c5d80e0a5cf003f2beb68ffd2 claude/confident-brown-5m2w9y 2026-11-17T19:31:48Z run 44154945291
+== bilder (simulator screenshots)
+GRÖNT: every shot exists
+dark-finding.png
+dark-locationoff.png
+dark-paused.png
+dark-riding-mph.png
+dark-riding.png
+light-riding.png
+real-moving.png
+real-stopped.png
