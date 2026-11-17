@@ -1,15 +1,15 @@
-3135dbbfef04a5bf779da2042892513fc66a5577 claude/confident-brown-5m2w9y 2026-11-17T17:55:11Z run 44142080114
+86a29baa23dc45383d1da6b198293f6a9f905fe8 claude/confident-brown-5m2w9y 2026-11-17T18:15:03Z run 44145627616
 == swift-release
-GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 8 s
+GRÖNT: 27 test, 0 fel, 0 s i testerna, bygget 5 s
 Långsammast (av 27):
-      0.1 s  TripEngineTests.testShortDipDoesNotPause
-      0.1 s  DialAndFormatTests.testSpeedFormat
-      0.0 s  TripEngineTests.testTripCodableRoundTrip
+      0.2 s  DialAndFormatTests.testDialAnglesImperial
+      0.1 s  TripEngineTests.testResumesAtOnePointFour
       0.0 s  DialAndFormatTests.testAverageFormat
+      0.0 s  TripEngineTests.testTripCodableRoundTrip
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
       0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
-      0.0 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testShortDipDoesNotPause
       0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
       0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
       0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
