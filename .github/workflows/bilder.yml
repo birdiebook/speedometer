@@ -99,6 +99,8 @@ jobs:
           sleep 10
           xcrun simctl io "$UDID" screenshot "$OUT/real-stopped.png" || true
           xcrun simctl terminate "$UDID" "$BID" || true
+          xcrun simctl spawn "$UDID" log show --last 3m --style compact --predicate 'eventMessage CONTAINS "LOC speed"' 2>/dev/null | grep -o "LOC speed.*" > /tmp/loc2.txt || true
+          wc -c /tmp/loc.txt /tmp/loc2.txt || true
           ls -l "$OUT"
       - name: Put the result on ci-resultat
         if: always()
@@ -119,7 +121,9 @@ jobs:
               ls "$OUT" 2>/dev/null || true
             fi
             echo "== location samples seen by the app (DEBUG log)"
-            grep -o "LOC speed.*" /tmp/loc.txt 2>/dev/null | head -8 || true
+            grep -o "LOC speed.*" /tmp/loc.txt 2>/dev/null | head -6 || true
+            grep -o "LOC speed.*" /tmp/loc2.txt 2>/dev/null | head -6 || true
+            echo "stderr bytes: $(wc -c < /tmp/loc.txt 2>/dev/null || echo none), log bytes: $(wc -c < /tmp/loc2.txt 2>/dev/null || echo none)"
           } > /tmp/resultat.txt
           cat /tmp/resultat.txt
           for i in 1 2 3 4 5; do
