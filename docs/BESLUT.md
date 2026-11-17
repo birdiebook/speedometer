@@ -11,8 +11,9 @@ Omprövas: om Idunn behöver något som bara den här appen har.
 
 ## B2 — Arbetsnamnet Speedometer
 
-Valt: repot och appen heter Speedometer tills vidare, och hemskärmen visar "Speedometer". Namnet i App Store
-måste vara unikt och bestäms före publiceringen; förslaget är "Needle Speedometer". Ägaren avgör.
+Valt: repot heter Speedometer och hemskärmen visar "Speedometer". Namnet i App Store är
+"speedometer - minimalist" (ägaren 2026-11-17, när appen skapades i App Store Connect); det går att byta fram till
+första publiceringen.
 
 ## B3 — Inget nät, inget konto, ingen reklam
 

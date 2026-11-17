@@ -21,7 +21,7 @@ Klart när:
 
 ## E3 — Publiceringen
 
-- Namnet i App Store (BESLUT B2), skärmbilder, integritetsetiketten "Data Not Collected", granskningen.
+- Skärmbilder, integritetsetiketten "Data Not Collected", granskningen.
 
 ## Senare, inte beslutat
 
