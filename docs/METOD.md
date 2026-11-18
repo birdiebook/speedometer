@@ -53,17 +53,16 @@ Status: antagande.
 
 ## M6 — Skalan
 
-240° från −120° till +120° (0° rakt upp, medurs). Skalan är fast och tätare ju högre farten är: vinkeln är
-`−120° + 240° · (2/π) · atan(v / mitten)`, där mitten är **60 km/h** (eller **40 mph**) och står rakt upp. Varje
-tiotal blir lite smalare än det förra (0–10 km/h tar 25°, 50–60 km/h 14°), och bågens slut nås aldrig, så skalan har
-inget tak. Siffror vid **0, 10, 20, 30, 40, 50, 60, 80, 100, 200, 500** km/h (mph: **0, 10, 20, 30, 40, 50, 60,
-100, 200, 500**), med minst 13° mellan grannar. Små streck var **2:a** enhet upp till 60, var **5:e** upp till 100,
-var **10:e** upp till 200 och var **50:e** upp till 500, där strecken slutar; mph är tätare upp mot slutet och får
-var **20:e** upp till 200 och var **100:e** upp till 500, så att strecken alltid har minst 2° emellan. Bara delen upp till den lägsta siffran
-som rymmer turens max, eller farten om den är högre, är tänd, och minst upp till **100 km/h** (**60 mph**). När
-turen går förbi tonas nästa streck och siffror in på **0,6 s**; inget som redan syns flyttas. En nollställning
-släcker dem igen (BESLUT B16). Över 500 går visaren vidare förbi strecken mot bågens slut.
-Status: antagande, efter Saabs hastighetsmätare (ägaren 2026-11-18); tunas på telefonen.
+240° från −120° till +120° (0° rakt upp, medurs). Skalan är fast och ritad i km/h: en siffra var **10:e** km/h upp
+till **100** och var **20:e** upp till **260**. Avstånden krymper jämnt ju högre farten är: ett tiotal tar **17°**
+vid 0–10 och smalnar jämnt till **15°** vid 90–100, ett tjugotal tar **11°** vid 100–120 och smalnar jämnt till
+**9°** vid 240–260, sammanlagt 240°. Mellan två siffror står farten jämnt fördelad. Små streck var **2:a** km/h upp
+till 100 och var **5:e** därefter. I mph står siffrorna 0–60 var 10:e och 80–160 var 20:e, där samma fart står på
+km/h-skalan, med små streck var 2:a mph upp till 60 och var 5:e därefter. Bara delen upp till den lägsta siffran som
+rymmer turens max, eller farten om den är högre, är tänd, och minst upp till **100 km/h** (**60 mph**). När turen går
+förbi tonas nästa siffra in på **0,6 s**; inget som redan syns flyttas. En nollställning släcker dem igen
+(BESLUT B16). Över 260 km/h (160 mph) stannar visaren vid slutet, och den stora siffran visar ändå farten.
+Status: antagande, efter Saabs hastighetsmätare och ägarens önskemål 2026-11-18; tunas på telefonen.
 
 ## M7 — Avrundningen
 

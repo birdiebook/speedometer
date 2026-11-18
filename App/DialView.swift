@@ -240,7 +240,7 @@ private extension Animation {
         .padding().background(Theme.background)
 }
 
-#Preview("High-speed train") {
-    DialView(speed: 300 / 3.6, state: .riding, maxSpeed: 320 / 3.6, unit: .metric, locationOff: false)
+#Preview("Car") {
+    DialView(speed: 130 / 3.6, state: .riding, maxSpeed: 152 / 3.6, unit: .metric, locationOff: false)
         .padding().background(Theme.background)
 }

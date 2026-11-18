@@ -16,8 +16,8 @@ struct DemoView: View {
     let name: String
 
     private let trip = Trip(distance: 12_400, movingTime: 2052, maxSpeed: 11.472)
-    /// A high-speed train at 300 km/h with a max of 320: the scale is lit up to 500 (BESLUT B16).
-    private let fastTrip = Trip(distance: 245_000, movingTime: 3240, maxSpeed: 88.9)
+    /// A car on the motorway at 130 km/h with a max of 152: the scale is lit up to 160 (BESLUT B16).
+    private let fastTrip = Trip(distance: 86_000, movingTime: 2940, maxSpeed: 42.2)
 
     private var unit: SpeedUnit {
         let system = Locale.current.measurementSystem
@@ -33,7 +33,7 @@ struct DemoView: View {
         case "locationOff":
             SpeedometerScreen(speed: nil, state: .findingGPS, trip: Trip(), unit: unit, locationOff: true)
         case "fast":
-            SpeedometerScreen(speed: 83.3, state: .riding, trip: fastTrip, unit: unit, locationOff: false)
+            SpeedometerScreen(speed: 36.1, state: .riding, trip: fastTrip, unit: unit, locationOff: false)
         default:
             SpeedometerScreen(speed: 7.5, state: .riding, trip: trip, unit: unit, locationOff: false)
         }

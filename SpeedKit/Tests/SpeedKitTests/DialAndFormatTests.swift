@@ -17,80 +17,87 @@ final class DialAndFormatTests: XCTestCase {
 
     // MARK: M6, BESLUT B16: a fixed scale that lights up as the trip gets faster
 
-    func testSixtyIsStraightUpAndTheScaleHasNoEnd() {
+    func testTheScaleRunsFromZeroToTwoHundredSixtyKmh() {
         let m = Dial(unit: .metric)
         XCTAssertEqual(m.angle(forValue: 0), -120, accuracy: 1e-9)
-        XCTAssertEqual(m.angle(forValue: 60), 0, accuracy: 1e-9)
         XCTAssertEqual(m.angle(forValue: -5), -120, accuracy: 1e-9, "clamped")
-        XCTAssertEqual(m.angle(forSpeed: 60 / 3.6), 0, accuracy: 1e-9)
-        XCTAssertLessThan(m.angle(forValue: 100_000), 120, "no ceiling: the end is never reached")
-        XCTAssertGreaterThan(m.angle(forValue: 100_000), 119.8)
+        XCTAssertEqual(m.angle(forValue: 10), -103, accuracy: 1e-9, "the first ten is 17 degrees")
+        XCTAssertEqual(m.angle(forValue: 100), 40, accuracy: 1e-9, "0-100 takes 160 degrees")
+        XCTAssertEqual(m.angle(forValue: 110), 45.5, accuracy: 1e-9, "half of the first twenty")
+        XCTAssertEqual(m.angle(forValue: 260), 120, accuracy: 1e-9)
+        XCTAssertEqual(m.angle(forValue: 320), 120, accuracy: 1e-9, "past the end the needle stops there")
+        XCTAssertEqual(m.angle(forSpeed: 100 / 3.6), 40, accuracy: 1e-9)
+        // mph numbers stand where the same speed stands in km/h.
         let i = Dial(unit: .imperial)
-        XCTAssertEqual(i.angle(forValue: 40), 0, accuracy: 1e-9)
-        XCTAssertEqual(i.angle(forSpeed: 40 * 0.44704), 0, accuracy: 1e-9)
+        XCTAssertEqual(i.angle(forValue: 60), m.angle(forValue: 60 * 1.609344), accuracy: 1e-9)
+        XCTAssertEqual(i.angle(forSpeed: 25), m.angle(forSpeed: 25), accuracy: 1e-12)
     }
 
-    func testEachTenIsNarrowerThanTheOneBefore() {
+    func testTheGapsNarrowAsTheSpeedRises() {
         for unit in [SpeedUnit.metric, .imperial] {
-            let d = Dial(unit: unit)
+            let labels = Dial(unit: unit, fitting: 1000).labels
+            XCTAssertEqual(labels.map { $0.value }, Dial.numbers(unit))
             var last = Double.infinity
-            for v in stride(from: 0, to: 200, by: 10) {
-                let width = d.angle(forValue: Double(v + 10)) - d.angle(forValue: Double(v))
-                XCTAssertLessThan(width, last, "\(unit) \(v)")
-                last = width
+            for (a, b) in zip(labels, labels.dropFirst()) {
+                XCTAssertLessThan(b.angle - a.angle, last, "\(unit) \(a.value)-\(b.value)")
+                last = b.angle - a.angle
             }
         }
-        XCTAssertEqual(Dial(unit: .metric).angle(forValue: 10) + 120, 25.2, accuracy: 0.05, "0-10 km/h")
+        XCTAssertEqual(Dial.numbers(.metric), [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260])
+        XCTAssertEqual(Dial.numbers(.imperial), [0, 10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160])
     }
 
-    func testNewNumbersLightUpAsTheTripGetsFaster() {
-        let metric: [(Double, Int)] = [(0, 100), (25, 100), (100, 100), (101, 200), (130, 200), (250, 500), (320, 500), (900, 500)]
+    func testNewNumbersLightUpOneAtATime() {
+        let metric: [(Double, Int)] = [(0, 100), (25, 100), (100, 100), (101, 120), (130, 140), (250, 260), (320, 260)]
         for (kmh, top) in metric {
             XCTAssertEqual(Dial(unit: .metric, fitting: kmh / 3.6).top, top, "\(kmh) km/h")
         }
-        let imperial: [(Double, Int)] = [(0, 60), (60, 60), (61, 100), (150, 200), (300, 500)]
+        let imperial: [(Double, Int)] = [(0, 60), (60, 60), (61, 80), (150, 160), (200, 160)]
         for (mph, top) in imperial {
             XCTAssertEqual(Dial(unit: .imperial, fitting: mph * 0.44704).top, top, "\(mph) mph")
         }
         XCTAssertEqual(Dial.top(fitting: .nan, unit: .metric), 100)
-        XCTAssertEqual(Dial(unit: .metric).labels.map { $0.value }, [0, 10, 20, 30, 40, 50, 60, 80, 100])
-        XCTAssertEqual(Dial(unit: .metric, fitting: 130 / 3.6).labels.last?.value, 200)
-        XCTAssertEqual(Dial(unit: .metric, fitting: 320 / 3.6).labels.last?.value, 500)
+        XCTAssertEqual(Dial(unit: .metric).labels.map { $0.value }, Array(stride(from: 0, through: 100, by: 10)))
+        XCTAssertEqual(Dial(unit: .metric, fitting: 130 / 3.6).labels.suffix(3).map { $0.value }, [100, 120, 140])
         XCTAssertEqual(Dial(unit: .imperial).labels.map { $0.value }, [0, 10, 20, 30, 40, 50, 60])
     }
 
     func testLitTicksNeverMove() {
         // A faster trip only adds ticks at the end; every tick that was lit keeps its angle.
         let first = Dial(unit: .metric).ticks
-        let train = Dial(unit: .metric, fitting: 320 / 3.6).ticks
-        XCTAssertEqual(Array(train.prefix(first.count)), first)
-        XCTAssertEqual(first.count, 39)
-        XCTAssertEqual(train.count, 55)
-        XCTAssertEqual(train.last?.value, 500)
+        let all = Dial(unit: .metric, fitting: 1000).ticks
+        XCTAssertEqual(Array(all.prefix(first.count)), first)
+        XCTAssertEqual(first.count, 51)
+        XCTAssertEqual(all.count, 83)
+        XCTAssertEqual(all.last?.value, 260)
         XCTAssertEqual(first[5].value, 10)
         XCTAssertTrue(first[5].isMajor)
         XCTAssertFalse(first[1].isMajor)
-        XCTAssertEqual(first[31].value, 65, "every 5 from 60")
+        XCTAssertEqual(all[51].value, 105, "every 5 above 100")
+        XCTAssertEqual(Dial(unit: .imperial, fitting: 1000).ticks.count, 51)
     }
 
     func testTicksNeverCrowd() {
         for unit in [SpeedUnit.metric, .imperial] {
             let ticks = Dial(unit: unit, fitting: 1000).ticks
-            XCTAssertEqual(ticks.last?.value, 500)
             for (a, b) in zip(ticks, ticks.dropFirst()) {
-                XCTAssertGreaterThanOrEqual(b.angle - a.angle, 1.9, "\(unit) \(a.value)-\(b.value)")
+                XCTAssertGreaterThanOrEqual(b.angle - a.angle, 2.2, "\(unit) \(a.value)-\(b.value)")
             }
         }
-        XCTAssertEqual(Dial(unit: .imperial, fitting: 1000).ticks.count, 47)
     }
 
-    func testNumbersNeverCrowd() {
-        // At least 13 degrees between neighbouring numbers, about 25 pt at the numbers' radius (FORM.md).
+    func testNumbersNeverOverlap() {
+        // Each number as a box at radius 112 (FORM.md): 17 pt digits about 10.2 pt wide and 12.5 pt high. Neighbours
+        // keep at least 2 pt apart, sideways near the top and up and down on the right.
         for unit in [SpeedUnit.metric, .imperial] {
-            let labels = Dial(unit: unit, fitting: 1000).labels
-            XCTAssertEqual(labels.map { $0.value }, Dial.numbers(unit))
-            for (a, b) in zip(labels, labels.dropFirst()) {
-                XCTAssertGreaterThanOrEqual(b.angle - a.angle, 13, "\(unit) \(a.value)-\(b.value)")
+            let boxes = Dial(unit: unit, fitting: 1000).labels.map { tick -> (x: Double, y: Double, w: Double) in
+                let p = Dial.point(radius: 112, angle: tick.angle)
+                return (p.x, p.y, Double(String(tick.value).count) * 10.2)
+            }
+            for (a, b) in zip(boxes, boxes.dropFirst()) {
+                let sideways = abs(b.x - a.x) - (a.w + b.w) / 2
+                let upDown = abs(b.y - a.y) - 12.5
+                XCTAssertGreaterThanOrEqual(max(sideways, upDown), 2, "\(unit) at \(a.x), \(a.y)")
             }
         }
     }

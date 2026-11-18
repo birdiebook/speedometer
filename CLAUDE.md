@@ -1,7 +1,7 @@
 # Speedometer — arbetssätt
 
-Speedometer är en iPhone-app, först för cykel men för allt som rör sig (BESLUT B16): en hastighetsmätare med
-visare som läser telefonens GPS och visar fart, sträcka, tid och snitt. Inget konto, ingen reklam, inget nät. Hemskärmen visar Speedometer; namnet i
+Speedometer är en iPhone-app, i första hand för cykel och bil men för allt som rör sig (BESLUT B16): en
+hastighetsmätare med visare som läser telefonens GPS och visar fart, sträcka, tid och snitt. Inget konto, ingen reklam, inget nät. Hemskärmen visar Speedometer; namnet i
 App Store är "speedometer - minimalist" (BESLUT B2). Etapperna står i [PLAN.md](PLAN.md).
 
 ## Regler — läs först

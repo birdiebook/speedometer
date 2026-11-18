@@ -95,13 +95,14 @@ direkt när den öppnades, innan något cyklats, och det väckte frågan vad som
 
 ## B16 — En fast skala som tänds efter hand
 
-Valt (ägaren 2026-11-18): appen ska fungera för allt som rör sig, cykel, bil, sportbil och tåg, även
-höghastighetståg, utan tak. Skalan är fast och tätare ju högre farten är, som på vissa bilar: bred vid cykelfart,
-smalare mot slutet, och den når aldrig sitt slut (METOD M6). Som på Saabs nattpanel är bara delen upp till 100 km/h
-tänd från början. När turen går fortare tänds nästa siffror vid slutet, och inget som redan syns flyttas. En
-nollställning släcker dem igen.
-Bortvalt: en skala som byter steg (0–60, 0–120, 0–180 …), provad samma dag i en simulering: hoppet från 60 till 120
-blev för mycket. Också bortvalt: en fast linjär skala för höga farter (cykeln skulle bara få en liten del av bågen)
-och en inställning (BESLUT B6). Kostnad: cykelfarten får ungefär halva vinkeln mot förr (10–20 km/h tar 24° i
-stället för 40°).
+Valt (ägaren 2026-11-18): appen görs i första hand för cykel och bil, men ska fungera även fortare. Skalan är fast,
+som på vissa bilar: en siffra var 10:e km/h upp till 100 och var 20:e upp till 260, aldrig större glapp, och
+avstånden krymper jämnt ju högre farten är (METOD M6). Som på Saabs nattpanel är bara delen upp till 100 km/h tänd
+från början. När turen går fortare tänds nästa siffra vid slutet, och inget som redan syns flyttas. En
+nollställning släcker dem igen. Över 260 km/h stannar visaren vid slutet och den stora siffran visar farten, så även
+ett höghastighetståg fungerar.
+Bortvalt, provat samma dag i simuleringar: en skala som byter steg (0–60, 0–120, 0–180 …), där hoppet från 60 till
+120 blev för mycket, och en skala utan slut med siffrorna 100, 200 och 500, där glappen blev för stora. Också
+bortvalt: en fast linjär skala och en inställning (BESLUT B6). Kostnad: cykelfarten får mindre vinkel än i bygge 2,
+17° per tiotal i stället för 40°.
 Omprövas: om skalan känns trång på cykeln.
