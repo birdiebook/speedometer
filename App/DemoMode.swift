@@ -16,7 +16,7 @@ struct DemoView: View {
     let name: String
 
     private let trip = Trip(distance: 12_400, movingTime: 2052, maxSpeed: 11.472)
-    /// A high-speed train at 300 km/h with a max of 320: the scale has grown to 0–360 km/h (BESLUT B16).
+    /// A high-speed train at 300 km/h with a max of 320: the scale is lit up to 500 (BESLUT B16).
     private let fastTrip = Trip(distance: 245_000, movingTime: 3240, maxSpeed: 88.9)
 
     private var unit: SpeedUnit {

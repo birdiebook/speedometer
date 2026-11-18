@@ -14,7 +14,7 @@ struct DialView: View {
     /// BESLUT B15: PAUSED only once something has been ridden; a new or reset trip shows the unit instead.
     var tripStarted: Bool = true
 
-    /// BESLUT B16: the scale grows to hold the trip's max, or the speed right after a reset.
+    /// BESLUT B16: the fixed scale, lit up to the trip's max (or the speed right after a reset).
     private var dial: Dial { Dial(unit: unit, fitting: max(maxSpeed, target)) }
     private var findingGPS: Bool { state == .findingGPS }
     private var paused: Bool { state == .paused }
@@ -50,21 +50,13 @@ struct DialView: View {
 
     // MARK: ticks and labels
 
+    /// The lit part of the fixed scale. When the trip goes past it, the next ticks and numbers fade in at the end and
+    /// nothing else moves (BESLUT B16, METOD M6); a reset fades them out again.
     private var scale: some View {
         ZStack(alignment: .topLeading) {
-            Canvas { ctx, _ in
-                for tick in dial.ticks {
-                    let outer = Dial.point(radius: 150, angle: tick.angle)
-                    let inner = Dial.point(radius: tick.isMajor ? 132 : 141, angle: tick.angle)
-                    var path = Path()
-                    path.move(to: CGPoint(x: outer.x, y: outer.y))
-                    path.addLine(to: CGPoint(x: inner.x, y: inner.y))
-                    ctx.stroke(
-                        path,
-                        with: .color(tick.isMajor ? Theme.primary : Theme.minorTick),
-                        style: StrokeStyle(lineWidth: tick.isMajor ? 2.5 : 1.5, lineCap: .round)
-                    )
-                }
+            ForEach(dial.ticks, id: \.value) { tick in
+                TickMark(tick: tick)
+                    .transition(.opacity)
             }
             ForEach(dial.labels, id: \.value) { tick in
                 let p = Dial.point(radius: 112, angle: tick.angle)
@@ -73,8 +65,10 @@ struct DialView: View {
                     .monospacedDigit() // BESLUT B11
                     .foregroundStyle(Theme.label)
                     .position(x: p.x, y: p.y)
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut(duration: Dial.revealDuration), value: dial.top)
     }
 
     // MARK: digital speed and mode line
@@ -115,10 +109,27 @@ struct DialView: View {
     }
 }
 
+/// One tick on the scale (FORM.md).
+private struct TickMark: View {
+    let tick: DialTick
+
+    var body: some View {
+        let outer = Dial.point(radius: 150, angle: tick.angle)
+        let inner = Dial.point(radius: tick.isMajor ? 132 : 141, angle: tick.angle)
+        Path { p in
+            p.move(to: CGPoint(x: outer.x, y: outer.y))
+            p.addLine(to: CGPoint(x: inner.x, y: inner.y))
+        }
+        .stroke(
+            tick.isMajor ? Theme.primary : Theme.minorTick,
+            style: StrokeStyle(lineWidth: tick.isMajor ? 2.5 : 1.5, lineCap: .round)
+        )
+    }
+}
+
 // MARK: what glides (METOD M2)
 //
-// The needle, the max marker and the big number glide in speed, and the needle and the marker are drawn on the scale
-// that shows. When the scale grows (BESLUT B16) they move with the labels at once instead of sweeping across them.
+// The needle, the max marker and the big number glide in speed, so the number always says what the needle points at.
 
 /// The needle and the hub.
 private struct Needle: View, Animatable {

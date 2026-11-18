@@ -53,15 +53,16 @@ Status: antagande.
 
 ## M6 — Skalan
 
-240° från −120° till +120° (0° rakt upp, medurs). Skalan börjar på **0–60 km/h** (metriskt) eller **0–40 mph**, med
-stora streck var 10:e enhet med siffra och små streck var 2:a. Den växer i steg när turens max, eller farten om den
-är högre, går över slutet: slutet blir startskalan gånger **1, 2, 3, 4, 6, 8, 12, 16 …** (efter 3 är varje steg
-det som stod två steg tidigare, dubblat), det minsta som rymmer farten. Det ger 60, 120, 180, 240, 360, 480, 720,
-960 … km/h och 40, 80, 120, 160, 240, 320 … mph, utan tak. Strecken står kvar på samma vinklar och bara siffrorna
-byts: stora streck var 10:e och små var 2:a enhet gånger steget. Skalan krymper bara när turen nollställs
-(BESLUT B16). Visaren och max-markeringen ritas på den skala som syns, så när skalan växer flyttar de sig i samma
-ögonblick som siffrorna. Över skalans slut stannar visaren vid slutet. Status: startskalan ur skissen; stegen är
-antaganden.
+240° från −120° till +120° (0° rakt upp, medurs). Skalan är fast och tätare ju högre farten är: vinkeln är
+`−120° + 240° · (2/π) · atan(v / mitten)`, där mitten är **60 km/h** (eller **40 mph**) och står rakt upp. Varje
+tiotal blir lite smalare än det förra (0–10 km/h tar 25°, 50–60 km/h 14°), och bågens slut nås aldrig, så skalan har
+inget tak. Siffror vid **0, 10, 20, 30, 40, 50, 60, 80, 100, 200, 500** km/h (mph: **0, 10, 20, 30, 40, 50, 60,
+100, 200, 500**), med minst 13° mellan grannar. Små streck var **2:a** enhet upp till 60, var **5:e** upp till 100,
+var **10:e** upp till 200 och var **50:e** upp till 500, där strecken slutar. Bara delen upp till den lägsta siffran
+som rymmer turens max, eller farten om den är högre, är tänd, och minst upp till **100 km/h** (**60 mph**). När
+turen går förbi tonas nästa streck och siffror in på **0,6 s**; inget som redan syns flyttas. En nollställning
+släcker dem igen (BESLUT B16). Över 500 går visaren vidare förbi strecken mot bågens slut.
+Status: antagande, efter Saabs hastighetsmätare (ägaren 2026-11-18); tunas på telefonen.
 
 ## M7 — Avrundningen
 

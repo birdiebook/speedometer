@@ -10,89 +10,78 @@ final class DialAndFormatTests: XCTestCase {
         XCTAssertEqual(SpeedUnit.imperial.speed(fromMetersPerSecond: 8.9408), 20, accuracy: 1e-9)
         XCTAssertEqual(SpeedUnit.metric.distance(fromMeters: 2500), 2.5, accuracy: 1e-9)
         XCTAssertEqual(SpeedUnit.imperial.distance(fromMeters: 1609.344), 1, accuracy: 1e-9)
-        XCTAssertEqual(SpeedUnit.metric.baseScaleMax, 60)
-        XCTAssertEqual(SpeedUnit.imperial.baseScaleMax, 40)
         XCTAssertEqual(SpeedUnit.metric.speedHeading, "KM/H")
         XCTAssertEqual(SpeedUnit.imperial.speedHeading, "MPH")
         XCTAssertEqual(SpeedUnit.imperial.distanceSuffix, "mi")
     }
 
-    // MARK: M6
+    // MARK: M6, BESLUT B16: a fixed scale that lights up as the trip gets faster
 
-    func testDialAnglesMetric() {
-        let d = Dial(unit: .metric)
-        XCTAssertEqual(d.angle(forValue: 0), -120, accuracy: 1e-9)
-        XCTAssertEqual(d.angle(forValue: 30), 0, accuracy: 1e-9)
-        XCTAssertEqual(d.angle(forValue: 60), 120, accuracy: 1e-9)
-        XCTAssertEqual(d.angle(forValue: 80), 120, accuracy: 1e-9, "clamped")
-        XCTAssertEqual(d.angle(forValue: -5), -120, accuracy: 1e-9, "clamped")
-        XCTAssertEqual(d.angle(forSpeed: 30 / 3.6), 0, accuracy: 1e-9)
-    }
-
-    func testDialAnglesImperial() {
-        let d = Dial(unit: .imperial)
-        XCTAssertEqual(d.angle(forValue: 20), 0, accuracy: 1e-9)
-        XCTAssertEqual(d.angle(forValue: 40), 120, accuracy: 1e-9)
-        XCTAssertEqual(d.angle(forSpeed: 20 * 0.44704), 0, accuracy: 1e-9)
-    }
-
-    func testTicksAndLabels() {
+    func testSixtyIsStraightUpAndTheScaleHasNoEnd() {
         let m = Dial(unit: .metric)
-        XCTAssertEqual(m.ticks.count, 31)
-        XCTAssertEqual(m.ticks.filter { $0.isMajor }.count, 7)
-        XCTAssertEqual(m.labels.map { $0.value }, [0, 10, 20, 30, 40, 50, 60])
-        XCTAssertEqual(m.ticks[5].value, 10)
-        XCTAssertEqual(m.ticks[5].angle, -80, accuracy: 1e-9)
-        XCTAssertTrue(m.ticks[5].isMajor)
-        XCTAssertFalse(m.ticks[1].isMajor)
+        XCTAssertEqual(m.angle(forValue: 0), -120, accuracy: 1e-9)
+        XCTAssertEqual(m.angle(forValue: 60), 0, accuracy: 1e-9)
+        XCTAssertEqual(m.angle(forValue: -5), -120, accuracy: 1e-9, "clamped")
+        XCTAssertEqual(m.angle(forSpeed: 60 / 3.6), 0, accuracy: 1e-9)
+        XCTAssertLessThan(m.angle(forValue: 100_000), 120, "no ceiling: the end is never reached")
+        XCTAssertGreaterThan(m.angle(forValue: 100_000), 119.8)
         let i = Dial(unit: .imperial)
-        XCTAssertEqual(i.ticks.count, 21)
-        XCTAssertEqual(i.labels.map { $0.value }, [0, 10, 20, 30, 40])
-        XCTAssertEqual(i.labels[2].angle, 0, accuracy: 1e-9)
+        XCTAssertEqual(i.angle(forValue: 40), 0, accuracy: 1e-9)
+        XCTAssertEqual(i.angle(forSpeed: 40 * 0.44704), 0, accuracy: 1e-9)
     }
 
-    // MARK: M6, BESLUT B16: the scale grows with the trip
-
-    func testTheScaleStartsAtSixtyAndGrowsInStepsWithoutACeiling() {
-        let metric: [(Double, Double)] = [
-            (0, 60), (60, 60), (60.01, 120), (120, 120), (121, 180), (180, 180), (181, 240),
-            (241, 360), (361, 480), (481, 720), (900, 960), (1000, 1440), (5000, 5760),
-        ]
-        for (value, end) in metric {
-            XCTAssertEqual(60 * Double(Dial.factor(fitting: value, base: 60)), end, "\(value) km/h")
+    func testEachTenIsNarrowerThanTheOneBefore() {
+        for unit in [SpeedUnit.metric, .imperial] {
+            let d = Dial(unit: unit)
+            var last = Double.infinity
+            for v in stride(from: 0, to: 200, by: 10) {
+                let width = d.angle(forValue: Double(v + 10)) - d.angle(forValue: Double(v))
+                XCTAssertLessThan(width, last, "\(unit) \(v)")
+                last = width
+            }
         }
-        let imperial: [(Double, Double)] = [(0, 40), (40, 40), (41, 80), (75, 80), (81, 120), (200, 240), (241, 320)]
-        for (value, end) in imperial {
-            XCTAssertEqual(40 * Double(Dial.factor(fitting: value, base: 40)), end, "\(value) mph")
+        XCTAssertEqual(Dial(unit: .metric).angle(forValue: 10) + 120, 25.2, accuracy: 0.05, "0-10 km/h")
+    }
+
+    func testNewNumbersLightUpAsTheTripGetsFaster() {
+        let metric: [(Double, Int)] = [(0, 100), (25, 100), (100, 100), (101, 200), (130, 200), (250, 500), (320, 500), (900, 500)]
+        for (kmh, top) in metric {
+            XCTAssertEqual(Dial(unit: .metric, fitting: kmh / 3.6).top, top, "\(kmh) km/h")
         }
-        XCTAssertEqual(Dial.factor(fitting: .infinity, base: 60), 1)
-        XCTAssertEqual(Dial.factor(fitting: .nan, base: 60), 1)
+        let imperial: [(Double, Int)] = [(0, 60), (60, 60), (61, 100), (150, 200), (300, 500)]
+        for (mph, top) in imperial {
+            XCTAssertEqual(Dial(unit: .imperial, fitting: mph * 0.44704).top, top, "\(mph) mph")
+        }
+        XCTAssertEqual(Dial.top(fitting: .nan, unit: .metric), 100)
+        XCTAssertEqual(Dial(unit: .metric).labels.map { $0.value }, [0, 10, 20, 30, 40, 50, 60, 80, 100])
+        XCTAssertEqual(Dial(unit: .metric, fitting: 130 / 3.6).labels.last?.value, 200)
+        XCTAssertEqual(Dial(unit: .metric, fitting: 320 / 3.6).labels.last?.value, 500)
+        XCTAssertEqual(Dial(unit: .imperial).labels.map { $0.value }, [0, 10, 20, 30, 40, 50, 60])
     }
 
-    func testTheScaleFitsASpeedInMetresPerSecond() {
-        XCTAssertEqual(Dial(unit: .metric).scaleMax, 60)
-        XCTAssertEqual(Dial(unit: .metric, fitting: 45 / 3.6).scaleMax, 60, "a bike")
-        XCTAssertEqual(Dial(unit: .metric, fitting: 130 / 3.6).scaleMax, 180, "a car on the motorway")
-        XCTAssertEqual(Dial(unit: .metric, fitting: 250 / 3.6).scaleMax, 360, "a sports car")
-        XCTAssertEqual(Dial(unit: .metric, fitting: 320 / 3.6).scaleMax, 360, "a high-speed train")
-        XCTAssertEqual(Dial(unit: .imperial, fitting: 70 * 0.44704).scaleMax, 80)
+    func testLitTicksNeverMove() {
+        // A faster trip only adds ticks at the end; every tick that was lit keeps its angle.
+        let first = Dial(unit: .metric).ticks
+        let train = Dial(unit: .metric, fitting: 320 / 3.6).ticks
+        XCTAssertEqual(Array(train.prefix(first.count)), first)
+        XCTAssertEqual(first.count, 39)
+        XCTAssertEqual(train.count, 55)
+        XCTAssertEqual(train.last?.value, 500)
+        XCTAssertEqual(first[5].value, 10)
+        XCTAssertTrue(first[5].isMajor)
+        XCTAssertFalse(first[1].isMajor)
+        XCTAssertEqual(first[31].value, 65, "every 5 from 60")
     }
 
-    func testAGrownScaleKeepsItsTicksAndChangesOnlyTheLabels() {
-        let first = Dial(unit: .metric)
-        let car = Dial(unit: .metric, fitting: 130 / 3.6)
-        XCTAssertEqual(car.ticks.count, first.ticks.count)
-        XCTAssertEqual(car.ticks.map { $0.angle }, first.ticks.map { $0.angle })
-        XCTAssertEqual(car.ticks.map { $0.isMajor }, first.ticks.map { $0.isMajor })
-        XCTAssertEqual(car.labels.map { $0.value }, [0, 30, 60, 90, 120, 150, 180])
-        XCTAssertEqual(car.angle(forValue: 90), 0, accuracy: 1e-9)
-        XCTAssertEqual(car.angle(forSpeed: 200 / 3.6), 120, accuracy: 1e-9, "clamped at the end")
-        let train = Dial(unit: .metric, fitting: 320 / 3.6)
-        XCTAssertEqual(train.labels.map { $0.value }, [0, 60, 120, 180, 240, 300, 360])
-        XCTAssertEqual(train.ticks[1].value, 12)
-        let mph = Dial(unit: .imperial, fitting: 190 * 0.44704)
-        XCTAssertEqual(mph.labels.map { $0.value }, [0, 60, 120, 180, 240])
-        XCTAssertEqual(mph.ticks.count, Dial(unit: .imperial).ticks.count)
+    func testNumbersNeverCrowd() {
+        // At least 13 degrees between neighbouring numbers, about 25 pt at the numbers' radius (FORM.md).
+        for unit in [SpeedUnit.metric, .imperial] {
+            let labels = Dial(unit: unit, fitting: 1000).labels
+            XCTAssertEqual(labels.map { $0.value }, Dial.numbers(unit))
+            for (a, b) in zip(labels, labels.dropFirst()) {
+                XCTAssertGreaterThanOrEqual(b.angle - a.angle, 13, "\(unit) \(a.value)-\(b.value)")
+            }
+        }
     }
 
     func testPointOnRadius() {

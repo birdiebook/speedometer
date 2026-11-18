@@ -31,9 +31,6 @@ public enum SpeedUnit: Equatable {
     public var speedSuffix: String { self == .metric ? "km/h" : "mph" }
     public var distanceSuffix: String { self == .metric ? "km" : "mi" }
 
-    /// METOD M6: the first scale ends at 60 km/h or 40 mph; it grows from there (Dial, BESLUT B16).
-    public var baseScaleMax: Double { self == .metric ? 60 : 40 }
-
     public func speed(fromMetersPerSecond v: Double) -> Double { v / metersPerSecondPerUnit }
     public func distance(fromMeters m: Double) -> Double { m / metersPerDistanceUnit }
 }

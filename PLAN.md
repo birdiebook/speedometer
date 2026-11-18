@@ -21,7 +21,7 @@ Klart när:
   är stillastående). Första provturen 2026-11-18 med bygge 2: appen fungerar, men visaren hoppade en gång i sekunden.
 - **Bygge 3** (inget bygge utan ja): 15 s innan finding GPS och paus efter 3 s utan fart även utan positioner
   (METOD M3), ingen PAUSED före första turen (BESLUT B15), och från provturen en visare som glider i stället för att
-  hoppa (METOD M2) och en skala som växer med turen, för bil och tåg (BESLUT B16). Sedan provturer på cykel, i bil
+  hoppa (METOD M2) och en fast skala som tänds efter hand, för bil och tåg (BESLUT B16). Sedan provturer på cykel, i bil
   och på tåg; konstanterna i METOD M1–M3 tunas.
 
 ## E3 — Publiceringen

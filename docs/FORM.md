@@ -19,10 +19,10 @@ Måtten ur skissen (BESLUT B5), för en skärm som är 390 punkter bred. Allt sk
 - En kvadrat på 340 × 340 pt, centrerad i ytan ovanför talen; mitten i (170, 170).
 - Skalan: 240° från −120° till +120° (0° rakt upp, medurs), METOD M6. Punkt på radien r vid vinkeln θ:
   `x = 170 + r·sin θ`, `y = 170 − r·cos θ`.
-- Stora streck (var 10:e enhet på startskalan): från r = 150 till r = 132, 2,5 pt, rundade ändar, textfärg.
-- Små streck (var 2:a enhet på startskalan): från r = 150 till r = 141, 1,5 pt, rundade ändar.
-- Siffrorna på skalan: r = 112, 17 pt, medium, etikettfärg. När skalan växer står strecken kvar och siffrorna byts
-  (METOD M6).
+- Stora streck vid siffrorna: från r = 150 till r = 132, 2,5 pt, rundade ändar, textfärg.
+- Små streck mellan dem: från r = 150 till r = 141, 1,5 pt, rundade ändar.
+- Siffrorna på skalan: r = 112, 17 pt, medium, etikettfärg. Var streck och siffror står, och hur mycket av skalan
+  som är tänt, står i METOD M6.
 - Visaren: från r = −20 (svansen) till r = 140, 3 pt, rundade ändar, textfärg. Navet: en cirkel med r = 8 i
   textfärg och en med r = 3 i bakgrundsfärg.
 - Max-markeringen: en triangel som pekar inåt, spetsen på r = 153 och basen på r = 166, ±2,2° kring max-vinkeln.

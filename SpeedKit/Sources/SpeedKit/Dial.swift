@@ -16,49 +16,58 @@ public struct DialTick: Equatable {
 }
 
 /// The scale geometry (METOD M6, BESLUT B5, B16). Angles are degrees, 0 straight up, clockwise.
+///
+/// The scale is fixed: wide at low speeds and narrower towards the end, so it holds every speed and nothing on it ever
+/// moves. Only the part up to `top` is lit; higher numbers light up when the trip gets there, like a Saab's night panel.
 public struct Dial: Equatable {
     // METOD M6: 240 degrees, from -120 to +120.
     public static let minAngle: Double = -120
     public static let maxAngle: Double = 120
-    // METOD M6: on the first scale a major tick every 10 units with a label, a minor one every 2. Both grow with
-    // the scale, so the ticks keep their angles and only the labels change.
-    public static let majorStep = 10
-    public static let minorStep = 2
+    // METOD M6: new numbers fade in over this long when the trip passes the lit part.
+    public static let revealDuration: TimeInterval = 0.6
 
     // FORM.md (BESLUT B5): the dial square and its centre.
     public static let size: Double = 340
     public static let center = DialPoint(x: 170, y: 170)
 
-    public let unit: SpeedUnit
-    /// METOD M6: how many times the first scale this one is: 1, 2, 3, 4, 6, 8, 12, 16, …
-    public let factor: Int
+    // METOD M6: minor ticks every 2 up to 60, every 5 up to 100, every 10 up to 200 and every 50 up to 500, where the
+    // ticks end. The same in km/h and mph.
+    static let tickSteps: [(upTo: Int, step: Int)] = [(60, 2), (100, 5), (200, 10), (500, 50)]
+    static let lastTick = 500
 
-    /// BESLUT B16: the smallest scale that holds `metersPerSecond` (the trip's max, or the speed if higher).
-    /// The first scale when nothing is given.
+    public let unit: SpeedUnit
+    /// BESLUT B16: the highest number lit so far.
+    public let top: Int
+
+    /// BESLUT B16: lit up to the smallest number that holds `metersPerSecond` (the trip's max, or the speed if
+    /// higher), and never less than the first top.
     public init(unit: SpeedUnit, fitting metersPerSecond: Double = 0) {
         self.unit = unit
-        self.factor = Dial.factor(fitting: unit.speed(fromMetersPerSecond: metersPerSecond), base: unit.baseScaleMax)
+        self.top = Dial.top(fitting: unit.speed(fromMetersPerSecond: metersPerSecond), unit: unit)
     }
 
-    /// The scale's end in displayed units: 60, 120, 180, 240, 360, … km/h or 40, 80, 120, 160, 240, … mph.
-    public var scaleMax: Double { unit.baseScaleMax * Double(factor) }
+    /// METOD M6: the speed straight up, half way along the scale: 60 km/h or 40 mph.
+    public static func middle(_ unit: SpeedUnit) -> Double { unit == .metric ? 60 : 40 }
 
-    /// METOD M6: the smallest step of 1, 2, 3, 4, 6, 8, 12, 16, … (after 3 each one is the one two places back,
-    /// doubled) whose scale reaches `value`, in displayed units. No ceiling.
-    static func factor(fitting value: Double, base: Double) -> Int {
-        guard value.isFinite else { return 1 }
-        var factor = 1
-        var next = (2, 3)
-        while base * Double(factor) < value {
-            factor = next.0
-            next = (next.1, next.0 * 2)
-        }
-        return factor
+    /// METOD M6: the numbers on the dial.
+    public static func numbers(_ unit: SpeedUnit) -> [Int] {
+        unit == .metric ? [0, 10, 20, 30, 40, 50, 60, 80, 100, 200, 500] : [0, 10, 20, 30, 40, 50, 60, 100, 200, 500]
     }
 
-    /// Needle angle for a value in displayed units, clamped to the scale (METOD M6).
+    /// METOD M6: lit from the start: up to 100 km/h or 60 mph.
+    public static func firstTop(_ unit: SpeedUnit) -> Int { unit == .metric ? 100 : 60 }
+
+    /// The smallest number from the first top on that holds `value` (displayed units); 500 above that.
+    static func top(fitting value: Double, unit: SpeedUnit) -> Int {
+        guard !value.isNaN else { return firstTop(unit) }
+        let stops = numbers(unit).filter { $0 >= firstTop(unit) }
+        return stops.first { Double($0) >= value } ?? lastTick
+    }
+
+    /// Needle angle for a value in displayed units (METOD M6): −120° + 240° · (2/π) · atan(value / middle). It never
+    /// reaches the end, so there is no ceiling.
     public func angle(forValue value: Double) -> Double {
-        let f = min(max(value / scaleMax, 0), 1)
+        let f = (2 / Double.pi) * atan(max(value, 0) / Dial.middle(unit))
         return Dial.minAngle + (Dial.maxAngle - Dial.minAngle) * f
     }
 
@@ -67,18 +76,24 @@ public struct Dial: Equatable {
         angle(forValue: unit.speed(fromMetersPerSecond: metersPerSecond))
     }
 
-    /// All ticks from 0 to the scale's end: on the first scale minor every 2 and major every 10, on the others the
-    /// same times the factor, so there are always as many and at the same angles.
+    /// The lit ticks, from 0 to the top; the numbered ones are major. Each keeps its angle whatever the top.
     public var ticks: [DialTick] {
-        let top = Int(scaleMax)
-        let minor = Dial.minorStep * factor
-        let major = Dial.majorStep * factor
-        return stride(from: 0, through: top, by: minor).map { v in
-            DialTick(value: v, angle: angle(forValue: Double(v)), isMajor: v % major == 0)
+        var values: [Int] = []
+        var v = 0
+        for band in Dial.tickSteps {
+            while v < band.upTo {
+                values.append(v)
+                v += band.step
+            }
+        }
+        values.append(Dial.lastTick)
+        let numbers = Set(Dial.numbers(unit))
+        return values.filter { $0 <= top }.map { v in
+            DialTick(value: v, angle: angle(forValue: Double(v)), isMajor: numbers.contains(v))
         }
     }
 
-    /// The labelled ticks.
+    /// The lit numbers.
     public var labels: [DialTick] { ticks.filter { $0.isMajor } }
 
     /// FORM.md: x = 170 + r sin(theta), y = 170 - r cos(theta). Theta in degrees.

@@ -28,8 +28,8 @@ macOS. Bortvalt: Codemagic, vars 500 minuter i månaden delas med de andra appar
 
 ## B5 — Formen: en visare
 
-Valt: en skärm med en visartavla (skissens variant A). Skalan går över 240° och börjar på 0–60 km/h, eller
-0–40 mph (BESLUT B7); den växer med turen (BESLUT B16). En orange markering stannar vid turens högsta fart, så att max inte behöver ett eget fält. Under tavlan:
+Valt: en skärm med en visartavla (skissens variant A). Skalan går över 240°, i km/h eller mph (BESLUT B7), är
+tätare ju högre farten är och tänds efter hand (BESLUT B16). En orange markering stannar vid turens högsta fart, så att max inte behöver ett eget fält. Under tavlan:
 distance, time och avg. Lägena är riding, paused och finding GPS. Appen följer telefonens ljusa och mörka läge.
 Visaren glider jämnt till varje ny fart, som i en bil som accelererar, i stället för att hoppa dit (ägaren
 2026-11-18, efter första provturen; METOD M2).
@@ -93,13 +93,15 @@ Valt (2026-11-17, efter bygge 2): när turen är tom (ny eller nollställd) visa
 PAUSED och utan "Hold to reset". Orden syns först när det finns en tur som står still. Skäl: appen visade PAUSED
 direkt när den öppnades, innan något cyklats, och det väckte frågan vad som var pausat.
 
-## B16 — Skalan växer med turen
+## B16 — En fast skala som tänds efter hand
 
 Valt (ägaren 2026-11-18): appen ska fungera för allt som rör sig, cykel, bil, sportbil och tåg, även
-höghastighetståg, utan tak. Skalan börjar på 0–60 km/h (0–40 mph), som passar cykeln, och växer i steg när turens
-max går över slutet (METOD M6). Den krymper när turen nollställs. Strecken står kvar och bara siffrorna byts, så
-tavlan ser likadan ut. Skälet till att följa max: max-markeringen hamnar alltid på skalan, och skalan byter inte
-fram och tillbaka vid varje rödljus.
-Bortvalt: en fast större skala (cykeln skulle bara använda en liten del av bågen), en inställning (BESLUT B6) och en
-skala som krymper av sig själv. Kostnad: en enda snabb utförsbacke ger cykelturen 0–120 tills den nollställs.
-Omprövas: om stegen känns ryckiga på telefonen, eller om en hög skala blir kvar och stör.
+höghastighetståg, utan tak. Skalan är fast och tätare ju högre farten är, som på vissa bilar: bred vid cykelfart,
+smalare mot slutet, och den når aldrig sitt slut (METOD M6). Som på Saabs nattpanel är bara delen upp till 100 km/h
+tänd från början. När turen går fortare tänds nästa siffror vid slutet, och inget som redan syns flyttas. En
+nollställning släcker dem igen.
+Bortvalt: en skala som byter steg (0–60, 0–120, 0–180 …), provad samma dag i en simulering: hoppet från 60 till 120
+blev för mycket. Också bortvalt: en fast linjär skala för höga farter (cykeln skulle bara få en liten del av bågen)
+och en inställning (BESLUT B6). Kostnad: cykelfarten får ungefär halva vinkeln mot förr (10–20 km/h tar 24° i
+stället för 40°).
+Omprövas: om skalan känns trång på cykeln.
