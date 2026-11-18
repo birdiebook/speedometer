@@ -1,9 +1,8 @@
-e10d9035582c682d9d378c376da7ee84c7a10b76 claude/sweet-edison-um9bir 2026-11-18T20:08:28Z run 44387667852
+1dd05ef9c539e8b5addaa8ffd9e21679911fa0c8 claude/sweet-edison-um9bir 2026-11-18T20:19:33Z run 44389676437
 == swift-release
-GRÖNT: 40 test, 0 fel, 0 s i testerna, bygget 7 s
-Långsammast (av 40):
-      0.1 s  DialAndFormatTests.testDistanceFormat
-      0.0 s  DialAndFormatTests.testAverageFormat
+GRÖNT: 41 test, 0 fel, 0 s i testerna, bygget 6 s
+Långsammast (av 41):
+      0.0 s  TripEngineTests.testAutoPauseAfterThreeSecondsBelowThreshold
       0.0 s  TripEngineTests.testTripCodableRoundTrip
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
@@ -17,5 +16,6 @@ Långsammast (av 40):
       0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
       0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
       0.0 s  TripEngineTests.testNothingCountsWhilePaused
+      0.0 s  TripEngineTests.testMaxUsesTheSmoothedSpeedSoASpikeDoesNotStick
 
 == metod-och-beslut: success
