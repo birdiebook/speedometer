@@ -1,0 +1,21 @@
+0f7325c8f24552d432f5efedadbf7740e1725995 claude/sweet-edison-um9bir 2026-11-18T20:51:27Z run 44395209328
+== swift-release
+GRÖNT: 41 test, 0 fel, 0 s i testerna, bygget 9 s
+Långsammast (av 41):
+      0.1 s  DialAndFormatTests.testDistanceFormat
+      0.0 s  TripEngineTests.testTripCodableRoundTrip
+      0.0 s  TripEngineTests.testAverageSpeed
+      0.0 s  DialAndFormatTests.testAverageFormat
+      0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
+      0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
+      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
+      0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
+      0.0 s  TripEngineTests.testShortDipDoesNotPause
+      0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
+      0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
+      0.0 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
+      0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
+
+== metod-och-beslut: success
