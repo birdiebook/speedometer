@@ -58,7 +58,8 @@ Status: antagande.
 tiotal blir lite smalare än det förra (0–10 km/h tar 25°, 50–60 km/h 14°), och bågens slut nås aldrig, så skalan har
 inget tak. Siffror vid **0, 10, 20, 30, 40, 50, 60, 80, 100, 200, 500** km/h (mph: **0, 10, 20, 30, 40, 50, 60,
 100, 200, 500**), med minst 13° mellan grannar. Små streck var **2:a** enhet upp till 60, var **5:e** upp till 100,
-var **10:e** upp till 200 och var **50:e** upp till 500, där strecken slutar. Bara delen upp till den lägsta siffran
+var **10:e** upp till 200 och var **50:e** upp till 500, där strecken slutar; mph är tätare upp mot slutet och får
+var **20:e** upp till 200 och var **100:e** upp till 500, så att strecken alltid har minst 2° emellan. Bara delen upp till den lägsta siffran
 som rymmer turens max, eller farten om den är högre, är tänd, och minst upp till **100 km/h** (**60 mph**). När
 turen går förbi tonas nästa streck och siffror in på **0,6 s**; inget som redan syns flyttas. En nollställning
 släcker dem igen (BESLUT B16). Över 500 går visaren vidare förbi strecken mot bågens slut.

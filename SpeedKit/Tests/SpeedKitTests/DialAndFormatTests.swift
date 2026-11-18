@@ -73,6 +73,17 @@ final class DialAndFormatTests: XCTestCase {
         XCTAssertEqual(first[31].value, 65, "every 5 from 60")
     }
 
+    func testTicksNeverCrowd() {
+        for unit in [SpeedUnit.metric, .imperial] {
+            let ticks = Dial(unit: unit, fitting: 1000).ticks
+            XCTAssertEqual(ticks.last?.value, 500)
+            for (a, b) in zip(ticks, ticks.dropFirst()) {
+                XCTAssertGreaterThanOrEqual(b.angle - a.angle, 1.9, "\(unit) \(a.value)-\(b.value)")
+            }
+        }
+        XCTAssertEqual(Dial(unit: .imperial, fitting: 1000).ticks.count, 47)
+    }
+
     func testNumbersNeverCrowd() {
         // At least 13 degrees between neighbouring numbers, about 25 pt at the numbers' radius (FORM.md).
         for unit in [SpeedUnit.metric, .imperial] {

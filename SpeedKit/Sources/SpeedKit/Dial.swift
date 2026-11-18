@@ -31,8 +31,10 @@ public struct Dial: Equatable {
     public static let center = DialPoint(x: 170, y: 170)
 
     // METOD M6: minor ticks every 2 up to 60, every 5 up to 100, every 10 up to 200 and every 50 up to 500, where the
-    // ticks end. The same in km/h and mph.
-    static let tickSteps: [(upTo: Int, step: Int)] = [(60, 2), (100, 5), (200, 10), (500, 50)]
+    // ticks end. The mph scale is tighter at the top, so there every 20 up to 200 and every 100 up to 500.
+    static func tickSteps(_ unit: SpeedUnit) -> [(upTo: Int, step: Int)] {
+        unit == .metric ? [(60, 2), (100, 5), (200, 10), (500, 50)] : [(60, 2), (100, 5), (200, 20), (500, 100)]
+    }
     static let lastTick = 500
 
     public let unit: SpeedUnit
@@ -80,7 +82,7 @@ public struct Dial: Equatable {
     public var ticks: [DialTick] {
         var values: [Int] = []
         var v = 0
-        for band in Dial.tickSteps {
+        for band in Dial.tickSteps(unit) {
             while v < band.upTo {
                 values.append(v)
                 v += band.step
