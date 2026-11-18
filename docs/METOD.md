@@ -53,9 +53,15 @@ Status: antagande.
 
 ## M6 — Skalan
 
-0–60 km/h (metriskt) eller 0–40 mph, över 240° från −120° till +120° (0° rakt upp, medurs). Stora streck var
-10:e enhet med siffra, små streck var 2:a. Över skalans slut stannar visaren vid slutet; siffran visar den riktiga
-farten. Status: antagande, ur skissen.
+240° från −120° till +120° (0° rakt upp, medurs). Skalan börjar på **0–60 km/h** (metriskt) eller **0–40 mph**, med
+stora streck var 10:e enhet med siffra och små streck var 2:a. Den växer i steg när turens max, eller farten om den
+är högre, går över slutet: slutet blir startskalan gånger **1, 2, 3, 4, 6, 8, 12, 16 …** (efter 3 är varje steg
+det som stod två steg tidigare, dubblat), det minsta som rymmer farten. Det ger 60, 120, 180, 240, 360, 480, 720,
+960 … km/h och 40, 80, 120, 160, 240, 320 … mph, utan tak. Strecken står kvar på samma vinklar och bara siffrorna
+byts: stora streck var 10:e och små var 2:a enhet gånger steget. Skalan krymper bara när turen nollställs
+(BESLUT B16). Visaren och max-markeringen ritas på den skala som syns, så när skalan växer flyttar de sig i samma
+ögonblick som siffrorna. Över skalans slut stannar visaren vid slutet. Status: startskalan ur skissen; stegen är
+antaganden.
 
 ## M7 — Avrundningen
 

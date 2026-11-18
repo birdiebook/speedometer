@@ -14,17 +14,14 @@ struct DialView: View {
     /// BESLUT B15: PAUSED only once something has been ridden; a new or reset trip shows the unit instead.
     var tripStarted: Bool = true
 
-    private var dial: Dial { Dial(unit: unit) }
+    /// BESLUT B16: the scale grows to hold the trip's max, or the speed right after a reset.
+    private var dial: Dial { Dial(unit: unit, fitting: max(maxSpeed, target)) }
     private var findingGPS: Bool { state == .findingGPS }
     private var paused: Bool { state == .paused }
 
     /// Where the needle and the number are heading: 0 while paused or finding GPS (FORM.md).
     private var target: Double {
         state == .riding ? (speed ?? 0) : 0
-    }
-
-    private var needleAngle: Double {
-        dial.angle(forSpeed: target)
     }
 
     var body: some View {
@@ -34,8 +31,13 @@ struct DialView: View {
             ZStack(alignment: .topLeading) {
                 scale
                     .frame(width: Dial.size, height: Dial.size)
-                if maxSpeed > 0 { maxMarker }
-                needle
+                if maxSpeed > 0 {
+                    MaxMarker(speed: maxSpeed, dial: dial)
+                        .animation(.needleGlide, value: maxSpeed)
+                }
+                // BESLUT B5: the needle glides to each new speed like a car's instead of jumping (METOD M2).
+                Needle(speed: target, dial: dial, color: findingGPS ? Theme.minorTick : Theme.primary)
+                    .animation(.needleGlide, value: target)
                 digital
             }
             .frame(width: Dial.size, height: Dial.size)
@@ -72,47 +74,6 @@ struct DialView: View {
                     .foregroundStyle(Theme.label)
                     .position(x: p.x, y: p.y)
             }
-        }
-    }
-
-    // MARK: max marker, needle, hub
-
-    /// Drawn pointing straight up and turned to the max, so it glides with the needle that pushes it (METOD M2).
-    private var maxMarker: some View {
-        let tip = Dial.point(radius: 153, angle: 0)
-        let b1 = Dial.point(radius: 166, angle: -2.2)
-        let b2 = Dial.point(radius: 166, angle: 2.2)
-        return Path { p in
-            p.move(to: CGPoint(x: tip.x, y: tip.y))
-            p.addLine(to: CGPoint(x: b1.x, y: b1.y))
-            p.addLine(to: CGPoint(x: b2.x, y: b2.y))
-            p.closeSubpath()
-        }
-        .fill(Theme.accent)
-        .frame(width: Dial.size, height: Dial.size)
-        .rotationEffect(.degrees(dial.angle(forSpeed: maxSpeed)))
-        .animation(.needleGlide, value: maxSpeed)
-    }
-
-    private var needle: some View {
-        let color = findingGPS ? Theme.minorTick : Theme.primary
-        let tail = Dial.point(radius: -20, angle: 0)
-        let tip = Dial.point(radius: 140, angle: 0)
-        return ZStack(alignment: .topLeading) {
-            Path { p in
-                p.move(to: CGPoint(x: tail.x, y: tail.y))
-                p.addLine(to: CGPoint(x: tip.x, y: tip.y))
-            }
-            .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-            .frame(width: Dial.size, height: Dial.size)
-            // Rotates about the hub, the centre of the 340 pt square.
-            .rotationEffect(.degrees(needleAngle))
-            // BESLUT B5: the needle glides to each new speed like a car's instead of jumping (METOD M2).
-            .animation(.needleGlide, value: needleAngle)
-            Circle().fill(color).frame(width: 16, height: 16)
-                .position(x: Dial.center.x, y: Dial.center.y)
-            Circle().fill(Theme.background).frame(width: 6, height: 6)
-                .position(x: Dial.center.x, y: Dial.center.y)
         }
     }
 
@@ -154,8 +115,70 @@ struct DialView: View {
     }
 }
 
-/// The big number, drawn from the same gliding speed as the needle (METOD M2), so the two always agree: it counts
-/// through the values on the way instead of jumping.
+// MARK: what glides (METOD M2)
+//
+// The needle, the max marker and the big number glide in speed, and the needle and the marker are drawn on the scale
+// that shows. When the scale grows (BESLUT B16) they move with the labels at once instead of sweeping across them.
+
+/// The needle and the hub.
+private struct Needle: View, Animatable {
+    var speed: Double // m/s
+    let dial: Dial
+    let color: Color
+
+    var animatableData: Double {
+        get { speed }
+        set { speed = newValue }
+    }
+
+    var body: some View {
+        let tail = Dial.point(radius: -20, angle: 0)
+        let tip = Dial.point(radius: 140, angle: 0)
+        ZStack(alignment: .topLeading) {
+            Path { p in
+                p.move(to: CGPoint(x: tail.x, y: tail.y))
+                p.addLine(to: CGPoint(x: tip.x, y: tip.y))
+            }
+            .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+            .frame(width: Dial.size, height: Dial.size)
+            // Rotates about the hub, the centre of the 340 pt square.
+            .rotationEffect(.degrees(dial.angle(forSpeed: speed)))
+            Circle().fill(color).frame(width: 16, height: 16)
+                .position(x: Dial.center.x, y: Dial.center.y)
+            Circle().fill(Theme.background).frame(width: 6, height: 6)
+                .position(x: Dial.center.x, y: Dial.center.y)
+        }
+    }
+}
+
+/// The orange marker at the trip's max, which the needle pushes ahead of it. Drawn pointing straight up, then turned.
+private struct MaxMarker: View, Animatable {
+    var speed: Double // m/s
+    let dial: Dial
+
+    var animatableData: Double {
+        get { speed }
+        set { speed = newValue }
+    }
+
+    var body: some View {
+        let tip = Dial.point(radius: 153, angle: 0)
+        let b1 = Dial.point(radius: 166, angle: -2.2)
+        let b2 = Dial.point(radius: 166, angle: 2.2)
+        Path { p in
+            p.move(to: CGPoint(x: tip.x, y: tip.y))
+            p.addLine(to: CGPoint(x: b1.x, y: b1.y))
+            p.addLine(to: CGPoint(x: b2.x, y: b2.y))
+            p.closeSubpath()
+        }
+        .fill(Theme.accent)
+        .frame(width: Dial.size, height: Dial.size)
+        .rotationEffect(.degrees(dial.angle(forSpeed: speed)))
+    }
+}
+
+/// The big number, from the same gliding speed as the needle, so the two always agree: it counts through the values
+/// on the way instead of jumping.
 private struct GlidingNumber: View, Animatable {
     var speed: Double // m/s
     let unit: SpeedUnit
@@ -203,5 +226,10 @@ private extension Animation {
 
 #Preview("Finding GPS") {
     DialView(speed: nil, state: .findingGPS, maxSpeed: 0, unit: .imperial, locationOff: false)
+        .padding().background(Theme.background)
+}
+
+#Preview("High-speed train") {
+    DialView(speed: 300 / 3.6, state: .riding, maxSpeed: 320 / 3.6, unit: .metric, locationOff: false)
         .padding().background(Theme.background)
 }

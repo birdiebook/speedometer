@@ -88,6 +88,8 @@ jobs:
           shot dark-locationoff dark en_SE locationOff
           shot light-riding light en_SE riding
           shot dark-riding-mph dark en_US riding
+          shot dark-fast dark en_SE fast
+          shot dark-fast-mph dark en_US fast
           # Real path: simulated GPS, no demo.
           xcrun simctl ui "$UDID" appearance dark
           xcrun simctl privacy "$UDID" grant location "$BID" || true
@@ -107,7 +109,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          want="dark-riding dark-paused dark-finding dark-locationoff light-riding dark-riding-mph real-moving real-stopped"
+          want="dark-riding dark-paused dark-finding dark-locationoff light-riding dark-riding-mph dark-fast dark-fast-mph real-moving real-stopped"
           missing=""
           for n in $want; do [ -s "$OUT/$n.png" ] || missing="$missing $n"; done
           {

@@ -10,8 +10,8 @@ final class DialAndFormatTests: XCTestCase {
         XCTAssertEqual(SpeedUnit.imperial.speed(fromMetersPerSecond: 8.9408), 20, accuracy: 1e-9)
         XCTAssertEqual(SpeedUnit.metric.distance(fromMeters: 2500), 2.5, accuracy: 1e-9)
         XCTAssertEqual(SpeedUnit.imperial.distance(fromMeters: 1609.344), 1, accuracy: 1e-9)
-        XCTAssertEqual(SpeedUnit.metric.scaleMax, 60)
-        XCTAssertEqual(SpeedUnit.imperial.scaleMax, 40)
+        XCTAssertEqual(SpeedUnit.metric.baseScaleMax, 60)
+        XCTAssertEqual(SpeedUnit.imperial.baseScaleMax, 40)
         XCTAssertEqual(SpeedUnit.metric.speedHeading, "KM/H")
         XCTAssertEqual(SpeedUnit.imperial.speedHeading, "MPH")
         XCTAssertEqual(SpeedUnit.imperial.distanceSuffix, "mi")
@@ -49,6 +49,50 @@ final class DialAndFormatTests: XCTestCase {
         XCTAssertEqual(i.ticks.count, 21)
         XCTAssertEqual(i.labels.map { $0.value }, [0, 10, 20, 30, 40])
         XCTAssertEqual(i.labels[2].angle, 0, accuracy: 1e-9)
+    }
+
+    // MARK: M6, BESLUT B16: the scale grows with the trip
+
+    func testTheScaleStartsAtSixtyAndGrowsInStepsWithoutACeiling() {
+        let metric: [(Double, Double)] = [
+            (0, 60), (60, 60), (60.01, 120), (120, 120), (121, 180), (180, 180), (181, 240),
+            (241, 360), (361, 480), (481, 720), (900, 960), (1000, 1440), (5000, 5760),
+        ]
+        for (value, end) in metric {
+            XCTAssertEqual(60 * Double(Dial.factor(fitting: value, base: 60)), end, "\(value) km/h")
+        }
+        let imperial: [(Double, Double)] = [(0, 40), (40, 40), (41, 80), (75, 80), (81, 120), (200, 240), (241, 320)]
+        for (value, end) in imperial {
+            XCTAssertEqual(40 * Double(Dial.factor(fitting: value, base: 40)), end, "\(value) mph")
+        }
+        XCTAssertEqual(Dial.factor(fitting: .infinity, base: 60), 1)
+        XCTAssertEqual(Dial.factor(fitting: .nan, base: 60), 1)
+    }
+
+    func testTheScaleFitsASpeedInMetresPerSecond() {
+        XCTAssertEqual(Dial(unit: .metric).scaleMax, 60)
+        XCTAssertEqual(Dial(unit: .metric, fitting: 45 / 3.6).scaleMax, 60, "a bike")
+        XCTAssertEqual(Dial(unit: .metric, fitting: 130 / 3.6).scaleMax, 180, "a car on the motorway")
+        XCTAssertEqual(Dial(unit: .metric, fitting: 250 / 3.6).scaleMax, 360, "a sports car")
+        XCTAssertEqual(Dial(unit: .metric, fitting: 320 / 3.6).scaleMax, 360, "a high-speed train")
+        XCTAssertEqual(Dial(unit: .imperial, fitting: 70 * 0.44704).scaleMax, 80)
+    }
+
+    func testAGrownScaleKeepsItsTicksAndChangesOnlyTheLabels() {
+        let first = Dial(unit: .metric)
+        let car = Dial(unit: .metric, fitting: 130 / 3.6)
+        XCTAssertEqual(car.ticks.count, first.ticks.count)
+        XCTAssertEqual(car.ticks.map { $0.angle }, first.ticks.map { $0.angle })
+        XCTAssertEqual(car.ticks.map { $0.isMajor }, first.ticks.map { $0.isMajor })
+        XCTAssertEqual(car.labels.map { $0.value }, [0, 30, 60, 90, 120, 150, 180])
+        XCTAssertEqual(car.angle(forValue: 90), 0, accuracy: 1e-9)
+        XCTAssertEqual(car.angle(forSpeed: 200 / 3.6), 120, accuracy: 1e-9, "clamped at the end")
+        let train = Dial(unit: .metric, fitting: 320 / 3.6)
+        XCTAssertEqual(train.labels.map { $0.value }, [0, 60, 120, 180, 240, 300, 360])
+        XCTAssertEqual(train.ticks[1].value, 12)
+        let mph = Dial(unit: .imperial, fitting: 190 * 0.44704)
+        XCTAssertEqual(mph.labels.map { $0.value }, [0, 60, 120, 180, 240])
+        XCTAssertEqual(mph.ticks.count, Dial(unit: .imperial).ticks.count)
     }
 
     func testPointOnRadius() {
