@@ -1,21 +1,21 @@
-9893e57aca547c71356923aab1631853783f6b93 claude/sweet-edison-um9bir 2026-11-18T19:17:06Z run 44378725723
+6019a6d6fd8a34a86dc96c44a552963d9728b5ac claude/sweet-edison-um9bir 2026-11-18T19:41:51Z run 44382825456
 == swift-release
-GRÖNT: 38 test, 0 fel, 0 s i testerna, bygget 10 s
-Långsammast (av 38):
-      0.1 s  TripEngineTests.testNothingCountsWhilePaused
-      0.1 s  TripEngineTests.testAutoPauseAfterThreeSecondsBelowThreshold
-      0.1 s  NeedleGlideTests.testAGlideGoesFromTheOldValueToTheNewInOnePointFourSeconds
-      0.1 s  DialAndFormatTests.testUnitConversions
-      0.0 s  TripEngineTests.testDistanceIsRawSpeedTimesDeltaWithTheDeltaCapped
-      0.0 s  TripEngineTests.testFirstSampleStartsFromTheRawSpeed
+GRÖNT: 41 test, 0 fel, 0 s i testerna, bygget 10 s
+Långsammast (av 41):
+      0.1 s  TripEngineTests.testAverageSpeed
       0.0 s  TripEngineTests.testTripCodableRoundTrip
-      0.0 s  TripEngineTests.testLimitsAreInclusive
-      0.0 s  TripEngineTests.testEmptyTrip
-      0.0 s  DialAndFormatTests.testAverageFormat
+      0.0 s  DialAndFormatTests.testAGrownScaleKeepsItsTicksAndChangesOnlyTheLabels
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
       0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
       0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
       0.0 s  TripEngineTests.testShortDipDoesNotPause
+      0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
+      0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
+      0.0 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
+      0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
+      0.0 s  TripEngineTests.testNothingCountsWhilePaused
 
 == metod-och-beslut: success
