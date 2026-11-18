@@ -31,6 +31,8 @@ macOS. Bortvalt: Codemagic, vars 500 minuter i månaden delas med de andra appar
 Valt: en skärm med en visartavla (skissens variant A). Skalan går 0–60 km/h, eller 0–40 mph (BESLUT B7), över
 240°. En orange markering stannar vid turens högsta fart, så att max inte behöver ett eget fält. Under tavlan:
 distance, time och avg. Lägena är riding, paused och finding GPS. Appen följer telefonens ljusa och mörka läge.
+Visaren glider jämnt till varje ny fart, som i en bil som accelererar, i stället för att hoppa dit (ägaren
+2026-11-18, efter första provturen; METOD M2).
 Bortvalt: en båge (variant B) och en rullande skala (variant C). Skäl: visaren är det som ger känslan av en bil,
 och ägaren valde den.
 

@@ -18,10 +18,10 @@ Klart när:
 - Ägaren: appen i App Store Connect (bundle-id `se.birdiebook.speedometer`) och hemligheterna i repots Actions.
 - Appikonen (klar, BESLUT B12).
 - `testflight.yml` grönt (BESLUT B13): bygge 1 uppladdat 2026-11-17, första försöket; bygge 2 samma kväll med rättelsen i METOD M1 och M3 (position utan fart
-  är stillastående). Kvar: provtur på cykeln.
-- **Bygge 3** (väntar på provturen, så att det ägaren märker på cykeln kommer med; inget bygge utan ja): på `main`
-  ligger redan 15 s innan finding GPS och paus efter 3 s utan fart även utan positioner (METOD M3), och ingen
-  PAUSED före första turen (BESLUT B15). Lägg till det provturen visar, främst konstanterna i METOD M2–M3. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
+  är stillastående). Första provturen 2026-11-18 med bygge 2: appen fungerar, men visaren hoppade en gång i sekunden.
+- **Bygge 3** (inget bygge utan ja): 15 s innan finding GPS och paus efter 3 s utan fart även utan positioner
+  (METOD M3), ingen PAUSED före första turen (BESLUT B15), och från provturen en visare som glider i stället för att
+  hoppa (METOD M2). Sedan en ny provtur; konstanterna i METOD M2–M3 tunas.
 
 ## E3 — Publiceringen
 

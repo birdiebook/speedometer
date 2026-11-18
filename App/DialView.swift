@@ -18,14 +18,13 @@ struct DialView: View {
     private var findingGPS: Bool { state == .findingGPS }
     private var paused: Bool { state == .paused }
 
-    /// While paused the needle and the number stand on 0 (FORM.md).
-    private var shownSpeed: Double? {
-        if findingGPS { return nil }
-        return paused ? 0 : speed
+    /// Where the needle and the number are heading: 0 while paused or finding GPS (FORM.md).
+    private var target: Double {
+        state == .riding ? (speed ?? 0) : 0
     }
 
     private var needleAngle: Double {
-        dial.angle(forSpeed: shownSpeed ?? 0)
+        dial.angle(forSpeed: target)
     }
 
     var body: some View {
@@ -78,11 +77,11 @@ struct DialView: View {
 
     // MARK: max marker, needle, hub
 
+    /// Drawn pointing straight up and turned to the max, so it glides with the needle that pushes it (METOD M2).
     private var maxMarker: some View {
-        let a = dial.angle(forSpeed: maxSpeed)
-        let tip = Dial.point(radius: 153, angle: a)
-        let b1 = Dial.point(radius: 166, angle: a - 2.2)
-        let b2 = Dial.point(radius: 166, angle: a + 2.2)
+        let tip = Dial.point(radius: 153, angle: 0)
+        let b1 = Dial.point(radius: 166, angle: -2.2)
+        let b2 = Dial.point(radius: 166, angle: 2.2)
         return Path { p in
             p.move(to: CGPoint(x: tip.x, y: tip.y))
             p.addLine(to: CGPoint(x: b1.x, y: b1.y))
@@ -90,6 +89,9 @@ struct DialView: View {
             p.closeSubpath()
         }
         .fill(Theme.accent)
+        .frame(width: Dial.size, height: Dial.size)
+        .rotationEffect(.degrees(dial.angle(forSpeed: maxSpeed)))
+        .animation(.needleGlide, value: maxSpeed)
     }
 
     private var needle: some View {
@@ -105,8 +107,8 @@ struct DialView: View {
             .frame(width: Dial.size, height: Dial.size)
             // Rotates about the hub, the centre of the 340 pt square.
             .rotationEffect(.degrees(needleAngle))
-            // BESLUT B5: a short spring on the needle (METOD M2).
-            .animation(.spring(duration: 0.35, bounce: 0.15), value: needleAngle)
+            // BESLUT B5: the needle glides to each new speed like a car's instead of jumping (METOD M2).
+            .animation(.needleGlide, value: needleAngle)
             Circle().fill(color).frame(width: 16, height: 16)
                 .position(x: Dial.center.x, y: Dial.center.y)
             Circle().fill(Theme.background).frame(width: 6, height: 6)
@@ -118,10 +120,8 @@ struct DialView: View {
 
     private var digital: some View {
         VStack(spacing: 4) {
-            Text(Format.speed(shownSpeed, unit: unit))
-                .font(.system(size: 64, weight: .semibold))
-                .monospacedDigit() // BESLUT B11
-                .foregroundStyle(findingGPS || paused ? Theme.dimmed : Theme.primary)
+            GlidingNumber(speed: target, unit: unit, dash: findingGPS, dimmed: findingGPS || paused)
+                .animation(.needleGlide, value: target)
             modeLine
         }
         .frame(width: Dial.size)
@@ -152,6 +152,43 @@ struct DialView: View {
                 .foregroundStyle(Theme.label)
         }
     }
+}
+
+/// The big number, drawn from the same gliding speed as the needle (METOD M2), so the two always agree: it counts
+/// through the values on the way instead of jumping.
+private struct GlidingNumber: View, Animatable {
+    var speed: Double // m/s
+    let unit: SpeedUnit
+    /// Finding GPS: the dash instead of a number (FORM.md).
+    let dash: Bool
+    let dimmed: Bool
+
+    var animatableData: Double {
+        get { speed }
+        set { speed = newValue }
+    }
+
+    var body: some View {
+        Text(Format.speed(dash ? nil : speed, unit: unit))
+            .font(.system(size: 64, weight: .semibold))
+            .monospacedDigit() // BESLUT B11
+            .foregroundStyle(dimmed ? Theme.dimmed : Theme.primary)
+    }
+}
+
+/// METOD M2: each change glides over `NeedleGlide.duration` along `NeedleGlide.progress`. It never merges with a
+/// glide that is still running: SwiftUI then runs them side by side and adds them up, so a new GPS sample carries
+/// on from where the needle is, and even steps turn into an even motion.
+private struct NeedleGlideAnimation: CustomAnimation {
+    func animate<V: VectorArithmetic>(value: V, time: TimeInterval, context: inout AnimationContext<V>) -> V? {
+        guard time < NeedleGlide.duration else { return nil }
+        return value.scaled(by: NeedleGlide.progress(time))
+    }
+}
+
+private extension Animation {
+    /// METOD M2.
+    static var needleGlide: Animation { Animation(NeedleGlideAnimation()) }
 }
 
 #Preview("Riding") {

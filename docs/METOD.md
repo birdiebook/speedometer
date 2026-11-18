@@ -15,10 +15,20 @@ appen stod kvar på finding GPS fast GPS fungerade. Därför de två nivåerna; 
 samtidigt från 2 till 3 m/s, så att en sämre men användbar fart inte pausar turen mitt i farten. Simulatorn
 (`simctl location`) ger `speedAccuracy` −1 i varje prov, så den riktiga vägen prövas på telefonen.
 
-## M2 — Utjämningen
+## M2 — Utjämningen och visarens rörelse
 
 Den visade farten jämnas ut exponentiellt med tidskonstanten **τ = 1,0 s**: `v ← v + α (rå − v)` med
-`α = 1 − e^(−Δt/τ)`. Visaren rör sig dessutom med en kort fjäder i appen. Status: antagande; tunas på cykeln.
+`α = 1 − e^(−Δt/τ)`.
+
+Visaren glider sedan till varje nytt värde i stället för att hoppa dit. Varje ändring fördelas jämnt över **1,0 s**,
+ungefär tiden till nästa GPS-prov, med mjuk start och mjukt slut på **0,4 s**: visarens fart stiger jämnt, håller
+och sjunker jämnt (en trapets), så rörelsen har inga knyck. Ett glid tar 1,4 s, och kommer ett nytt värde under
+tiden läggs glidningarna ihop. Vid jämn acceleration blir stegen lika stora, och då vrider sig visaren med jämn fart
+hela tiden mellan proven, som i en bil. Den hamnar aldrig utanför värdena den fått, och alltså aldrig förbi
+max-markeringen. Den stora siffran och max-markeringen följer samma rörelse, så att de alltid visar samma sak som
+visaren. Priset är att visaren ligger i snitt 0,7 s efter den utjämnade farten.
+Status: antagande; tunas på cykeln. Mätt 2026-11-18, första provturen (bygge 2): med en kort fjäder (0,35 s) var
+visaren framme på en tredjedel av sekunden och stod sedan still till nästa prov, så den hoppade en gång i sekunden.
 
 ## M3 — Autopausen
 
