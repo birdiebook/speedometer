@@ -1,0 +1,5 @@
+b7c854420e0ec2e4c9e9c1507d85162d15138288 claude/serene-curie-5ojh0u 2026-11-20T21:30:51Z run 44820366671
+== bilder (simulator screenshots)
+RÖTT: missing shots: dark-riding dark-paused dark-finding dark-locationoff light-riding dark-riding-mph dark-menu dark-trail light-trail dark-trail-finger real-moving real-stopped
+== location samples seen by the app (DEBUG log)
+stderr bytes: none, log bytes: none
