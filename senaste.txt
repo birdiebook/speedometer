@@ -1,13 +1,11 @@
-e46353d377c6c1e8b9ac2ebe0654c3ac05b5ffb8 claude/serene-curie-5ojh0u 2026-11-20T13:53:08Z run 44748087047
+e46353d377c6c1e8b9ac2ebe0654c3ac05b5ffb8 main 2026-11-20T16:24:46Z run 44772967113
 == swift-release
 GRÖNT: 48 test, 0 fel, 0 s i testerna, bygget 7 s
 Långsammast (av 48):
-      0.1 s  TripEngineTests.testNothingCountsWhilePaused
+      0.1 s  TrailTests.testTheMaxMarkerGoesAcrossTheLineAndAwayFromTheMiddle
       0.0 s  TrailTests.testThinningKeepsTheEndsAndTheGapsAndDoublesTheSpacing
-      0.0 s  TrailTests.testTheMaxMarkerGoesAcrossTheLineAndAwayFromTheMiddle
-      0.0 s  TripEngineTests.testAPositionWithoutSpeedIsAStopNotMissingGPS
-      0.0 s  DialAndFormatTests.testAverageFormat
       0.0 s  TripEngineTests.testTripCodableRoundTrip
+      0.0 s  DialAndFormatTests.testAverageFormat
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
       0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
@@ -17,5 +15,7 @@ Långsammast (av 48):
       0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
       0.0 s  TripEngineTests.testResumesAtOnePointFour
       0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
+      0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
 
 == metod-och-beslut: success
