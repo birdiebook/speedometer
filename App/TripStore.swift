@@ -3,7 +3,7 @@ import CoreLocation
 import SpeedKit
 
 /// Holds the engine, saves the trip after every change and the trail every 30 s, and restores both on launch
-/// (BESLUT B10, B16).
+/// (BESLUT B10, B16). Runs the GPS while the app is open and, during a ride, in the background (BESLUT B17).
 @MainActor
 final class TripStore: ObservableObject {
     @Published private(set) var engine: TripEngine
@@ -22,6 +22,11 @@ final class TripStore: ObservableObject {
     private static let trailSaveInterval: TimeInterval = 30
     private var savedTrail = Trail()
     private var lastTrailSave: TimeInterval = 0
+    // METOD M11: in the background the GPS stays on while the trip has ridden within this many seconds.
+    private static let backgroundGrace: TimeInterval = 600
+    private var lastRiding: TimeInterval?
+    private var inBackground = false
+    private var running = false
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -60,23 +65,36 @@ final class TripStore: ObservableObject {
         return (system == .us || system == .uk) ? .imperial : .metric
     }
 
-    // MARK: lifecycle (BESLUT B10: location only while the app is active)
+    // MARK: lifecycle (BESLUT B17: the GPS runs while the app is open, and in the background during a ride)
 
     func activate() {
+        inBackground = false
         source.start()
+        running = true
         timer?.invalidate()
-        // METOD M3: the 5 s no-fix timeout is checked once a second.
+        // METOD M3: the no-fix timeout is checked once a second; METOD M9, M11 too.
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
         tick()
     }
 
-    func deactivate() {
+    /// BESLUT B17: the screen goes off or another app comes forward. During a ride the GPS stays on.
+    func enterBackground() {
+        inBackground = true
+        saveTrail() // METOD M9
+        stopInBackgroundIfIdle(now: Date().timeIntervalSinceReferenceDate)
+    }
+
+    /// METOD M11: in the background, no ride within the last 10 minutes turns the GPS off until the app opens.
+    private func stopInBackgroundIfIdle(now: TimeInterval) {
+        guard inBackground, running else { return }
+        if let last = lastRiding, now - last < TripStore.backgroundGrace { return }
         source.stop()
+        running = false
         timer?.invalidate()
         timer = nil
-        saveTrail() // METOD M9
+        saveTrail(now: now)
     }
 
     // MARK: engine
@@ -85,6 +103,9 @@ final class TripStore: ObservableObject {
         let before = engine.trip
         engine.ingest(sample)
         saveIfChanged(from: before)
+        let now = Date().timeIntervalSinceReferenceDate
+        if engine.state == .riding { lastRiding = now }
+        stopInBackgroundIfIdle(now: now) // METOD M11
     }
 
     private func tick() {
@@ -92,6 +113,7 @@ final class TripStore: ObservableObject {
         engine.tick(now: now)
         // METOD M9: the trail every 30 s.
         if now - lastTrailSave >= TripStore.trailSaveInterval { saveTrail(now: now) }
+        stopInBackgroundIfIdle(now: now) // METOD M11
     }
 
     /// BESLUT B6: long-press resets the trip.

@@ -62,7 +62,7 @@ Medan turen rullar (M3) och provet har giltig fart (M1, alltså `horizontalAccur
 punkt i spåret: latitud, longitud, den utjämnade farten (M2) och turens sträcka och tid i det ögonblicket (M4), så
 att fingret på spåret visar samma tal som mätaren. En ny punkt läggs till först när den ligger minst **10 m** från
 förra punkten. Ligger den mer än **5 gånger** det avståndet bort (50 m från början) räknas sträckan emellan som ett
-glapp, ett GPS-avbrott eller appen i bakgrunden, och ritas prickad. Blir det fler än **20 000** punkter tas varannan
+glapp, ett GPS-avbrott eller GPS avstängd efter ett långt stopp (M11), och ritas prickad. Blir det fler än **20 000** punkter tas varannan
 bort och minsta avståndet fördubblas, så att filen hålls liten även på en lång tur. Avstånd räknas i en lokal plan
 projektion (ekvirektangulär, jordens radie **6 371 000 m**), som räcker för en cykeltur. Spåret skrivs till fil var
 **30:e s** och när appen lämnar förgrunden. Status: antaganden; 10 m och glappets gräns tunas på cykeln. Vid 60 km/h
@@ -74,3 +74,10 @@ Samma plana projektion som M9, kring mitten av spårets ytterkanter, med norr up
 väljs så att hela spåret ryms; spåret räknas som minst **300 m** brett och högt, så att en kort tur och GPS-brus inte
 förstoras upp. Färgen: medelfarten mellan två punkter delas med turens max (M5) och delas in i **10** lika steg, var
 och ett med en färg i FORM.md. Fingret väljer den punkt som ligger närmast på skärmen. Status: antaganden, ur skissen.
+
+## M11 — Platsen i bakgrunden
+
+När appen går till bakgrunden (skärmen släckt eller en annan app framme) fortsätter platsen att läsas så länge turen
+har rullat (M3) inom de senaste **10 min**. Har den inte det stängs GPS av, direkt eller senare, tills appen öppnas
+igen. Kontrollen görs vid varje prov och en gång i sekunden. Status: antagande; en avvägning mellan batteriet och
+att ett rödljus, en paus eller ett köp på vägen inte ska bryta turen.

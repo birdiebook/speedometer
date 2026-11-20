@@ -17,8 +17,8 @@ första publiceringen.
 
 ## B3 — Inget nät, inget konto, ingen reklam
 
-Valt: appen har ingen nätverkskod, ingen analys och inga tredjepartsbibliotek. Platsen läses bara medan appen är
-öppen ("When In Use"). Det som sparas är turens tal (sträcka, tid, max) och spåret för den pågående turen
+Valt: appen har ingen nätverkskod, ingen analys och inga tredjepartsbibliotek. Platsen läses med tillståndet "When
+In Use": medan appen är öppen och, under en tur, med skärmen släckt (BESLUT B17). Det som sparas är turens tal (sträcka, tid, max) och spåret för den pågående turen
 (BESLUT B16), båda bara på telefonen; inget lämnar den. Skäl: det är hela löftet, och det ger "Data Not Collected"
 i App Store, där Apple bara räknar data som skickas från telefonen.
 Ändrat 2026-11-20 (ägaren): tidigare sparades inget spår alls; spåret kom med Trail (BESLUT B16).
@@ -60,6 +60,7 @@ Valt: turens tal sparas på telefonen (UserDefaults) efter varje ändring och l�
 nollställer. Med appen i bakgrunden läses ingen plats, så turen står still då. Bortvalt: plats i bakgrunden i
 första versionen (kräver "Always" eller en bakgrundsdeklaration, och mer att förklara i granskningen).
 Omprövas: med fart på låsskärmen (Live Activity).
+Ändrat 2026-11-20 (BESLUT B17): under en tur läses platsen vidare med skärmen släckt.
 
 ## B11 — Systemets typsnitt, siffror med fast bredd
 
@@ -104,10 +105,22 @@ färger: grå när det går långsamt, orange när det går fort, med skalan fr�
 tavlan. Toppfarten markeras med tavlans orange triangel och sitt tal. Ett finger på linjen visar farten, sträckan och
 tiden på den platsen, och resten av turen tonas ner. Bara den pågående turen ritas: håll-in på mätaren nollställer
 turen och spåret tillsammans (BESLUT B6). Sidan öppnas från menyn (BESLUT B14) och stängs genom att svepa ner. Inga
-knappar och inga inställningar. Med appen i bakgrunden läses ingen plats (BESLUT B10); ett sådant glapp ritas som en
-prickad rak linje (METOD M9).
+knappar och inga inställningar. Där platsen inte lästs, ett GPS-avbrott eller GPS avstängd efter ett långt stopp
+(BESLUT B17), ritas en prickad rak linje (METOD M9).
 Spåret sparas i en fil på telefonen, undantagen från säkerhetskopian, och lämnar aldrig telefonen (BESLUT B3).
 Bortvalt: en färgskala i regnbåge (ruta B: visar mer men bryter appens färger), alla turer ovanpå varandra (ruta C:
 blir en karta över var man bor och rör sig över tid), en riktig karta under linjen (kartbilderna hämtas över nätet,
 BESLUT B3) och tavlans skala 0–60 (en lugn tur blir nästan bara grå).
 Omprövas: om alla turer (ruta C) önskas; då behövs ett beslut om hur länge spår sparas.
+
+## B17 — Turen fortsätter med skärmen släckt
+
+Valt (ägaren 2026-11-20, efter provturen med bygge 3: spåret tappades där skärmen var släckt): under en tur läses
+platsen vidare när skärmen släcks eller en annan app kommer fram, så att turens tal och spåret räknas som vanligt.
+Samma tillstånd som förut, "When In Use"; appen anger plats i bakgrunden (`UIBackgroundModes: location`) och iOS
+visar sin blå platsmarkering medan den läser. GPS stängs av i bakgrunden när turen inte har rullat på 10 minuter
+(METOD M11), så att en glömd app inte tömmer batteriet; den startar igen när appen öppnas. Skäl: en cykeltur görs
+ofta med telefonen låst i fickan eller i en hållare med musik framme, och då försvann bitar av turen.
+Kostnad: GPS är på under hela turen även med släckt skärm, och granskningen frågar varför appen läser plats i
+bakgrunden (svaret: för att mäta en pågående cykeltur). Inget lämnar telefonen (BESLUT B3).
+Bortvalt: "Always" (onödigt och en större fråga till användaren), och att läsa platsen i bakgrunden utan gräns.

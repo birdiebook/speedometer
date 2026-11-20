@@ -40,6 +40,8 @@ targets:
           - UIInterfaceOrientationPortrait
         # Without this every build stops at the export question in App Store Connect.
         ITSAppUsesNonExemptEncryption: false
-        # BESLUT B3, B10, B16: When In Use only, no background modes.
-        NSLocationWhenInUseUsageDescription: Speedometer uses your location to show your speed and draw your trail. It never leaves your phone.
+        # BESLUT B3, B16, B17: When In Use only; during a ride the location is read on with the screen off.
+        NSLocationWhenInUseUsageDescription: Speedometer uses your location to show your speed and draw your trail, also with the screen off during a ride. It never leaves your phone.
+        UIBackgroundModes:
+          - location
     scheme: {}

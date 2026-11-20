@@ -1,7 +1,8 @@
 import CoreLocation
 import SpeedKit
 
-/// The phone's GPS (BESLUT B3, B10): "When In Use", read only while the app is active.
+/// The phone's GPS (BESLUT B3, B17): "When In Use"; the store decides when it runs, which during a ride includes the
+/// background, with iOS's blue location indicator.
 /// Only a `GPSSample` leaves this class: speed, accuracies and the coordinates for the trail of the current trip,
 /// which stays on the phone (BESLUT B16).
 final class LocationSource: NSObject, CLLocationManagerDelegate {
@@ -9,6 +10,10 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
     var onAuthorizationChange: ((CLAuthorizationStatus) -> Void)?
 
     private let manager = CLLocationManager()
+    /// BESLUT B17: keeps the "When In Use" app in use in the background while the GPS runs.
+    private var backgroundSession: CLBackgroundActivitySession?
+    /// Whether the store wants updates; an authorization change must not start them otherwise.
+    private var wanted = false
 
     override init() {
         super.init()
@@ -17,26 +22,35 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
         manager.activityType = .fitness
         manager.distanceFilter = kCLDistanceFilterNone
         manager.pausesLocationUpdatesAutomatically = false
+        // BESLUT B17: needs `UIBackgroundModes: location` in Info.plist (project.yml).
+        manager.allowsBackgroundLocationUpdates = true
+        manager.showsBackgroundLocationIndicator = true
     }
 
     var authorizationStatus: CLAuthorizationStatus { manager.authorizationStatus }
 
     /// Asks for permission the first time, then starts updates once allowed.
     func start() {
+        wanted = true
         if manager.authorizationStatus == .notDetermined {
             manager.requestWhenInUseAuthorization()
         }
         beginUpdatesIfAllowed()
     }
 
-    /// BESLUT B10: no location with the app in the background.
+    /// BESLUT B17: the GPS off, the background session ended.
     func stop() {
+        wanted = false
         manager.stopUpdatingLocation()
+        backgroundSession?.invalidate()
+        backgroundSession = nil
     }
 
     private func beginUpdatesIfAllowed() {
+        guard wanted else { return }
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
+            if backgroundSession == nil { backgroundSession = CLBackgroundActivitySession() }
             manager.startUpdatingLocation()
         default:
             break

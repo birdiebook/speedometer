@@ -13,11 +13,14 @@ struct SpeedometerApp: App {
                     #if DEBUG
                     if DemoMode.name != nil { return } // demo: no store, no location
                     #endif
-                    let active = phase == .active
                     // BESLUT B6: the screen stays on while the app is open.
-                    UIApplication.shared.isIdleTimerDisabled = active
-                    // BESLUT B10: location only while the app is active.
-                    if active { store.activate() } else { store.deactivate() }
+                    UIApplication.shared.isIdleTimerDisabled = phase == .active
+                    // BESLUT B17: during a ride the location is read on in the background.
+                    switch phase {
+                    case .active: store.activate()
+                    case .background: store.enterBackground()
+                    default: break // inactive is a moment between the two (control centre, app switcher)
+                    }
                 }
         }
     }
