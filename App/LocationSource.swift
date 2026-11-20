@@ -1,8 +1,9 @@
 import CoreLocation
 import SpeedKit
 
-/// The phone's GPS (BESLUT B3, B10): "When In Use", read only while the app is active, never stored as a track.
-/// Only a `GPSSample` leaves this class: speed and accuracies, no coordinates.
+/// The phone's GPS (BESLUT B3, B10): "When In Use", read only while the app is active.
+/// Only a `GPSSample` leaves this class: speed, accuracies and the coordinates for the trail of the current trip,
+/// which stays on the phone (BESLUT B16).
 final class LocationSource: NSObject, CLLocationManagerDelegate {
     var onSample: ((GPSSample) -> Void)?
     var onAuthorizationChange: ((CLAuthorizationStatus) -> Void)?
@@ -57,7 +58,9 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
                 time: location.timestamp.timeIntervalSinceReferenceDate,
                 speed: location.speed,
                 speedAccuracy: location.speedAccuracy,
-                horizontalAccuracy: location.horizontalAccuracy
+                horizontalAccuracy: location.horizontalAccuracy,
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude
             ))
         }
     }

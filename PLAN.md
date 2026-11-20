@@ -23,6 +23,9 @@ Klart när:
   ligger redan 15 s innan finding GPS och paus efter 3 s utan fart även utan positioner (METOD M3), och ingen
   PAUSED före första turen (BESLUT B15). Lägg till det provturen visar, främst konstanterna i METOD M2–M3. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
 
+- **Trail** (BESLUT B16, ägaren 2026-11-20): menyn (B14), spåret (METOD M9) och sidan (METOD M10, FORM.md). Grönt i
+  CI krävs; provas på cykeln med nästa bygge, efter ägarens ja.
+
 ## E3 — Publiceringen
 
 - Skärmbilder, integritetsetiketten "Data Not Collected", granskningen.

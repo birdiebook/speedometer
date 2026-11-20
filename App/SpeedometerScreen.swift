@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 import SpeedKit
 
-/// The whole screen (BESLUT B5, B6): dial, big number, the three numbers and the hint line.
+/// The whole screen (BESLUT B5, B6): dial, big number, the three numbers, the hint line and the menu icon (B14).
 /// Plain values in, no store, so it can be drawn with fake values.
 struct SpeedometerScreen: View {
     let speed: Double?
@@ -10,6 +10,8 @@ struct SpeedometerScreen: View {
     let trip: Trip
     let unit: SpeedUnit
     let locationOff: Bool
+    /// BESLUT B14: opens the menu; no icon when nil.
+    var onMenu: (() -> Void)? = nil
 
     var body: some View {
         GeometryReader { geo in
@@ -29,6 +31,17 @@ struct SpeedometerScreen: View {
             // FORM.md: 56 pt at the bottom, counted from the screen edge, so the home indicator's inset is part of it.
             .padding(.bottom, max(0, 56 - geo.safeAreaInsets.bottom))
             .padding(.top, 8)
+        }
+        .overlay(alignment: .topTrailing) {
+            if let onMenu {
+                // BESLUT B14: a quiet icon in the corner; the dial and the numbers do not move for it (FORM.md).
+                Button(action: onMenu) {
+                    MenuIcon().frame(width: 44, height: 44).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 13)
+                .accessibilityLabel("Menu")
+            }
         }
         .background(Theme.background.ignoresSafeArea())
     }
@@ -80,10 +93,25 @@ struct SpeedometerScreen: View {
     }
 }
 
+/// BESLUT B14: three lines, 20 x 14 pt (FORM.md).
+private struct MenuIcon: View {
+    var body: some View {
+        Path { p in
+            for y in [1.0, 7.0, 13.0] {
+                p.move(to: CGPoint(x: 1, y: y))
+                p.addLine(to: CGPoint(x: 19, y: y))
+            }
+        }
+        .stroke(Theme.label, style: StrokeStyle(lineWidth: 1.75, lineCap: .round))
+        .frame(width: 20, height: 14)
+    }
+}
+
 private let previewTrip = Trip(distance: 12_400, movingTime: 2052, maxSpeed: 45 / 3.6)
 
 #Preview("Riding") {
-    SpeedometerScreen(speed: 36 / 3.6, state: .riding, trip: previewTrip, unit: .metric, locationOff: false)
+    SpeedometerScreen(speed: 36 / 3.6, state: .riding, trip: previewTrip, unit: .metric, locationOff: false,
+                      onMenu: {})
 }
 
 #Preview("Paused") {

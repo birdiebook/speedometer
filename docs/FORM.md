@@ -47,3 +47,51 @@ Måtten ur skissen (BESLUT B5), för en skärm som är 390 punkter bred. Allt sk
 - **Location off** (E1): nekas eller begränsad platsåtkomst visar samma layout som finding GPS, men med `LOCATION OFF`
   (12 pt, semibold, spärrad 3 pt, etikettfärg) under enheten i stället för pricken och `FINDING GPS`, och längst ner
   länken `Allow location in Settings` (13 pt, orange) som öppnar appens inställningar.
+
+## Menyn (BESLUT B14)
+
+- Ikonen: tre streck, 20 × 14 pt, 1,75 pt, rundade ändar, etikettfärg, i en tryckyta på 44 × 44 pt i mätarens övre
+  högra hörn, med strecken 25 pt från skärmens kant. Talen och tavlan flyttar sig inte för den.
+- Bladet: 140 pt högt, med systemets handtag. Bakgrund `#1C1C1E` mörkt, `#FFFFFF` ljust. En rad på minst 64 pt med
+  20 pt sidmarginal: `Trail` (17 pt, medium, textfärg), under den `This ride, drawn by speed` (13 pt, etikettfärg),
+  längst till höger en vinkel (15 pt, semibold, små strecks färg). Raden öppnar Trail.
+
+## Trail (BESLUT B16)
+
+Ett blad över hela skärmen med systemets handtag, i appens bakgrundsfärg. 25 pt marginal på sidorna, 24 pt nedtill.
+
+- Överst, 28 pt ner: `TRAIL` till vänster (12 pt, medium, spärrad 1,5 pt, etikettfärg) och turens sträcka och tid
+  till höger, `12.4 km · 34:12` (12 pt, medium, fast bredd, etikettfärg).
+- Spåret fyller ytan mellan raden överst och skalan nederst, 16 pt från båda, med 12 pt luft runt linjen.
+  Linjen: 4 pt, rundade ändar och hörn, färgad i tio steg efter farten (METOD M10). Ett glapp (METOD M9) är en rak
+  prickad linje, 2 pt, prickar var 6:e pt, i små strecks färg.
+- Start: en ring med r = 4,5 pt, 2 pt i etikettfärg, fylld med bakgrundsfärg. Slut (eller där du är nu): en prick med
+  r = 5 pt i textfärg med 2 pt kant i bakgrundsfärg.
+- Max: tavlans orange triangel, 12 pt lång och 11 pt bred, med spetsen 9 pt från punkten och pekande mot den, och
+  maxfarten som heltal bredvid (13 pt, semibold, orange). Den sitter till höger om punkten, eller till vänster om
+  punkten ligger nära högerkanten.
+- Skalan nederst: en stapel på 4 pt med de tio färgerna, under den `0` till vänster och turens max till höger,
+  `39 km/h` (12 pt, medium, etikettfärg), 8 pt emellan.
+- Fingret på spåret: en ring med r = 10 pt, 2,5 pt i textfärg, fylld med bakgrundsfärg och med en prick på r = 4,5 pt
+  i punktens färg. Ovanför (under, nära överkanten) en bubbla i textfärg med 10 pt rundning: farten som heltal
+  (19 pt, semibold, bakgrundsfärg) och enheten (12 pt, medium). Delen efter punkten ritas med 28 % opacitet. Raden
+  överst visar punktens sträcka och tid i textfärg, och skalan får en markering på 3 × 14 pt i textfärg vid punktens
+  fart. När fingret lyfts försvinner allt detta.
+- Utan spår (ny eller nollställd tur): bara raden överst och, mitt på sidan, `Your trail appears here once you ride.`
+  (13 pt, etikettfärg).
+
+| Steg (långsamt → fort) | Mörkt | Ljust |
+|---|---|---|
+| 1 | `#525255` | `#CCCBCE` |
+| 2 | `#636263` | `#C2BFBF` |
+| 3 | `#757372` | `#B8B3B0` |
+| 4 | `#878481` | `#AEA7A2` |
+| 5 | `#9A9590` | `#A59C93` |
+| 6 | `#ACA192` | `#A49383` |
+| 7 | `#BFA585` | `#AD8E70` |
+| 8 | `#D1AA77` | `#B5885C` |
+| 9 | `#E4AE65` | `#BC8244` |
+| 10 | `#F6B14F` | `#C47B24` |
+
+Färgerna är mitten av varje steg i en övergång i OKLab: mörkt `#4A4A4E` → `#A39E98` → `#FFB340`, ljust `#D1D1D6` →
+`#A0968C` → `#C77700`, alltså från grått till max-markeringens orange.

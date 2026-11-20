@@ -15,6 +15,8 @@ public struct TripEngine {
 
     public private(set) var state: TripState = .findingGPS
     public private(set) var trip: Trip
+    /// BESLUT B16: the trail of this trip; reset together with the numbers.
+    public private(set) var trail: Trail
 
     private var smoothed: Double?
     /// METOD M3: the last sample with a position (for the 5 s no-GPS timeout).
@@ -23,9 +25,10 @@ public struct TripEngine {
     private var lastSpeedTime: TimeInterval?
     private var belowSince: TimeInterval?
 
-    /// A restored trip keeps its numbers but starts in findingGPS (BESLUT B10).
-    public init(trip: Trip = Trip()) {
+    /// A restored trip keeps its numbers and trail but starts in findingGPS (BESLUT B10, B16).
+    public init(trip: Trip = Trip(), trail: Trail = Trail()) {
         self.trip = trip
+        self.trail = trail
     }
 
     /// METOD M2: the smoothed speed in m/s; nil while finding GPS. While paused the app shows 0 instead.
@@ -33,9 +36,11 @@ public struct TripEngine {
         state == .findingGPS ? nil : smoothed
     }
 
-    /// BESLUT B6: long-press resets the trip numbers. Smoothing and mode carry on, so the needle does not blink.
+    /// BESLUT B6: long-press resets the trip numbers and, with them, the trail (BESLUT B16). Smoothing and mode
+    /// carry on, so the needle does not blink.
     public mutating func reset() {
         trip = Trip()
+        trail = Trail()
     }
 
     public mutating func ingest(_ sample: GPSSample) {
@@ -103,6 +108,11 @@ public struct TripEngine {
             trip.distance += sample.speed * dt
             trip.movingTime += dt
             trip.maxSpeed = max(trip.maxSpeed, v)
+            // METOD M9: a trail point carries the smoothed speed and the trip's numbers at that moment.
+            if let latitude = sample.latitude, let longitude = sample.longitude {
+                trail.add(latitude: latitude, longitude: longitude, speed: v,
+                          distance: trip.distance, time: trip.movingTime)
+            }
         }
     }
 

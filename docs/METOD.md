@@ -55,3 +55,22 @@ Den stora siffran visas som heltal. Sträckan och snittet med en decimal. Tiden 
 ## M8 — Enheterna
 
 1 km/h = 1/3,6 m/s; 1 mph = 0,44704 m/s; 1 mi = 1 609,344 m. Status: standard (definitionerna).
+
+## M9 — Spåret
+
+Medan turen rullar (M3) och provet har giltig fart (M1, alltså `horizontalAccuracy` högst 30 m) kan provet bli en
+punkt i spåret: latitud, longitud, den utjämnade farten (M2) och turens sträcka och tid i det ögonblicket (M4), så
+att fingret på spåret visar samma tal som mätaren. En ny punkt läggs till först när den ligger minst **10 m** från
+förra punkten. Ligger den mer än **5 gånger** det avståndet bort (50 m från början) räknas sträckan emellan som ett
+glapp, ett GPS-avbrott eller appen i bakgrunden, och ritas prickad. Blir det fler än **20 000** punkter tas varannan
+bort och minsta avståndet fördubblas, så att filen hålls liten även på en lång tur. Avstånd räknas i en lokal plan
+projektion (ekvirektangulär, jordens radie **6 371 000 m**), som räcker för en cykeltur. Spåret skrivs till fil var
+**30:e s** och när appen lämnar förgrunden. Status: antaganden; 10 m och glappets gräns tunas på cykeln. Vid 60 km/h
+och ett prov i sekunden ligger två punkter normalt högst 27 m isär, så 50 m är ett avbrott på minst ett par sekunder.
+
+## M10 — Spårets bild
+
+Samma plana projektion som M9, kring mitten av spårets ytterkanter, med norr uppåt och lika skala i båda led. Skalan
+väljs så att hela spåret ryms; spåret räknas som minst **300 m** brett och högt, så att en kort tur och GPS-brus inte
+förstoras upp. Färgen: medelfarten mellan två punkter delas med turens max (M5) och delas in i **10** lika steg, var
+och ett med en färg i FORM.md. Fingret väljer den punkt som ligger närmast på skärmen. Status: antaganden, ur skissen.

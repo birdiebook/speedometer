@@ -1,6 +1,7 @@
 import Foundation
 
-/// One GPS reading, reduced to what the trip needs. No coordinates: no track is ever kept (BESLUT B3).
+/// One GPS reading, reduced to what the trip needs. The coordinates feed only the trail of the current trip, which
+/// stays on the phone (BESLUT B3, B16).
 public struct GPSSample: Equatable {
     /// Seconds on any monotonic-enough clock; only differences are used.
     public var time: TimeInterval
@@ -10,12 +11,18 @@ public struct GPSSample: Equatable {
     public var speedAccuracy: Double
     /// Horizontal accuracy in metres. A negative value means invalid.
     public var horizontalAccuracy: Double
+    /// Degrees; nil when the source gives none (METOD M9).
+    public var latitude: Double?
+    public var longitude: Double?
 
-    public init(time: TimeInterval, speed: Double, speedAccuracy: Double, horizontalAccuracy: Double) {
+    public init(time: TimeInterval, speed: Double, speedAccuracy: Double, horizontalAccuracy: Double,
+                latitude: Double? = nil, longitude: Double? = nil) {
         self.time = time
         self.speed = speed
         self.speedAccuracy = speedAccuracy
         self.horizontalAccuracy = horizontalAccuracy
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     // METOD M1: limits for a usable sample.

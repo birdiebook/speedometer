@@ -2,7 +2,8 @@ import Foundation
 import CoreLocation
 import SpeedKit
 
-/// Holds the engine, saves the trip after every change and restores it on launch (BESLUT B10).
+/// Holds the engine, saves the trip after every change and the trail every 30 s, and restores both on launch
+/// (BESLUT B10, B16).
 @MainActor
 final class TripStore: ObservableObject {
     @Published private(set) var engine: TripEngine
@@ -17,6 +18,10 @@ final class TripStore: ObservableObject {
     private let source = LocationSource()
     private var timer: Timer?
     private static let key = "trip.v1"
+    // METOD M9: the trail is written this often (s) while the app is open, and when it leaves the foreground.
+    private static let trailSaveInterval: TimeInterval = 30
+    private var savedTrail = Trail()
+    private var lastTrailSave: TimeInterval = 0
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -27,7 +32,13 @@ final class TripStore: ObservableObject {
            let trip = try? JSONDecoder().decode(Trip.self, from: data) {
             restored = trip
         }
-        self.engine = TripEngine(trip: restored)
+        // BESLUT B16: the trail belongs to the trip; without the trip it is not restored.
+        var restoredTrail = Trail()
+        if !restored.isEmpty, let trail = TrailFile.load() {
+            restoredTrail = trail
+        }
+        self.engine = TripEngine(trip: restored, trail: restoredTrail)
+        self.savedTrail = restoredTrail
 
         source.onSample = { [weak self] sample in
             MainActor.assumeIsolated { self?.ingest(sample) }
@@ -40,6 +51,7 @@ final class TripStore: ObservableObject {
 
     var state: TripState { engine.state }
     var trip: Trip { engine.trip }
+    var trail: Trail { engine.trail }
     var displayedSpeed: Double? { engine.displayedSpeed }
 
     /// BESLUT B7: metric regions get km/h and km, the US and the UK get mph and mi.
@@ -64,6 +76,7 @@ final class TripStore: ObservableObject {
         source.stop()
         timer?.invalidate()
         timer = nil
+        saveTrail() // METOD M9
     }
 
     // MARK: engine
@@ -75,7 +88,10 @@ final class TripStore: ObservableObject {
     }
 
     private func tick() {
-        engine.tick(now: Date().timeIntervalSinceReferenceDate)
+        let now = Date().timeIntervalSinceReferenceDate
+        engine.tick(now: now)
+        // METOD M9: the trail every 30 s.
+        if now - lastTrailSave >= TripStore.trailSaveInterval { saveTrail(now: now) }
     }
 
     /// BESLUT B6: long-press resets the trip.
@@ -83,6 +99,7 @@ final class TripStore: ObservableObject {
         engine.reset()
         resetCount += 1
         save()
+        saveTrail() // BESLUT B16: the empty trail removes the file
     }
 
     private func updateAuthorization(_ status: CLAuthorizationStatus) {
@@ -93,6 +110,14 @@ final class TripStore: ObservableObject {
 
     private func saveIfChanged(from before: Trip) {
         if engine.trip != before { save() }
+    }
+
+    /// METOD M9: writes the trail if it changed since the last write.
+    private func saveTrail(now: TimeInterval = Date().timeIntervalSinceReferenceDate) {
+        lastTrailSave = now
+        guard engine.trail != savedTrail else { return }
+        TrailFile.save(engine.trail)
+        savedTrail = engine.trail
     }
 
     private func save() {

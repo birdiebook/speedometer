@@ -2,8 +2,8 @@
 import SwiftUI
 import SpeedKit
 
-/// Debug-only screenshot mode: `-demo <riding|paused|finding|locationOff>` draws the screen with fixed values,
-/// with no store and no location. Compiled out of Release, so the shipped app has no such path.
+/// Debug-only screenshot mode: `-demo <riding|paused|finding|locationOff|menu|trail|trailFinger>` draws the screen
+/// with fixed values, with no store and no location. Compiled out of Release, so the shipped app has no such path.
 enum DemoMode {
     static var name: String? {
         let args = ProcessInfo.processInfo.arguments
@@ -30,8 +30,16 @@ struct DemoView: View {
             SpeedometerScreen(speed: nil, state: .findingGPS, trip: Trip(), unit: unit, locationOff: false)
         case "locationOff":
             SpeedometerScreen(speed: nil, state: .findingGPS, trip: Trip(), unit: unit, locationOff: true)
+        case "menu": // BESLUT B14
+            SpeedometerScreen(speed: 7.5, state: .riding, trip: trip, unit: unit, locationOff: false, onMenu: {})
+                .sheet(isPresented: .constant(true)) { MenuSheet(onTrail: {}) }
+        case "trail": // BESLUT B16
+            TrailScreen(trail: DemoTrail.engine.trail, trip: DemoTrail.engine.trip, unit: unit)
+        case "trailFinger":
+            TrailScreen(trail: DemoTrail.engine.trail, trip: DemoTrail.engine.trip, unit: unit,
+                        initialSelection: DemoTrail.fingerIndex)
         default:
-            SpeedometerScreen(speed: 7.5, state: .riding, trip: trip, unit: unit, locationOff: false)
+            SpeedometerScreen(speed: 7.5, state: .riding, trip: trip, unit: unit, locationOff: false, onMenu: {})
         }
     }
 }
