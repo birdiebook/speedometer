@@ -30,11 +30,16 @@ public struct TrailLayout {
     public let segmentGaps: [Bool]
     /// The point with the highest speed, for the max marker.
     public let maxIndex: Int?
+    /// The area the trail was fitted into, in points.
+    public let width: Double
+    public let height: Double
 
     /// Fits `trail` into a `width` x `height` area, `inset` points in from every edge, north up (METOD M10).
     /// `topSpeed` is the trip's max (METOD M5); the colour steps run from 0 to it.
     public init(trail: Trail, topSpeed: Double, width: Double, height: Double, inset: Double = 0) {
         let pts = trail.points
+        self.width = width
+        self.height = height
         guard !pts.isEmpty else {
             points = []
             segmentLevels = []
@@ -108,6 +113,26 @@ public struct TrailLayout {
         let upper = min(range.upperBound, points.count - 1)
         guard upper > lower else { return [] }
         return ((lower + 1)...upper).filter { segmentGaps[$0] }
+    }
+
+    /// FORM.md: a unit vector across the line at point `i`, for the max marker, so that it sits beside the line and
+    /// not on it. It points away from the middle of the trail, or toward it when that would put something `reach`
+    /// points out past the edge of the area.
+    public func markerDirection(at i: Int, reach: Double) -> TrailXY {
+        guard points.count >= 2, points.indices.contains(i) else { return TrailXY(x: 1, y: 0) }
+        let a = points[max(i - 3, 0)]
+        let b = points[min(i + 3, points.count - 1)]
+        let length = ((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y)).squareRoot()
+        guard length > 0 else { return TrailXY(x: 1, y: 0) }
+        var n = TrailXY(x: -(b.y - a.y) / length, y: (b.x - a.x) / length)
+        let xs = points.map(\.x)
+        let ys = points.map(\.y)
+        let middle = TrailXY(x: (xs.min()! + xs.max()!) / 2, y: (ys.min()! + ys.max()!) / 2)
+        let p = points[i]
+        if (p.x - middle.x) * n.x + (p.y - middle.y) * n.y < 0 { n = TrailXY(x: -n.x, y: -n.y) }
+        let end = TrailXY(x: p.x + n.x * reach, y: p.y + n.y * reach)
+        if end.x < 0 || end.x > width || end.y < 0 || end.y > height { n = TrailXY(x: -n.x, y: -n.y) }
+        return n
     }
 
     /// METOD M10: the point closest to a finger on the screen.

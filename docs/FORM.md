@@ -68,8 +68,9 @@ Ett blad över hela skärmen med systemets handtag, i appens bakgrundsfärg. 25 
 - Start: en ring med r = 4,5 pt, 2 pt i etikettfärg, fylld med bakgrundsfärg. Slut (eller där du är nu): en prick med
   r = 5 pt i textfärg med 2 pt kant i bakgrundsfärg.
 - Max: tavlans orange triangel, 12 pt lång och 11 pt bred, med spetsen 9 pt från punkten och pekande mot den, och
-  maxfarten som heltal bredvid (13 pt, semibold, orange). Den sitter till höger om punkten, eller till vänster om
-  punkten ligger nära högerkanten.
+  maxfarten som heltal bortom den, 25 pt från punkten (13 pt, semibold, orange). Den sitter på tvären mot linjen, så
+  att den aldrig ligger på linjen, på den sida som vetter bort från spårets mitt; når den då mer än 46 pt utanför
+  ytan vänds den mot mitten.
 - Skalan nederst: en stapel på 4 pt med de tio färgerna, under den `0` till vänster och turens max till höger,
   `39 km/h` (12 pt, medium, etikettfärg), 8 pt emellan.
 - Fingret på spåret: en ring med r = 10 pt, 2,5 pt i textfärg, fylld med bakgrundsfärg och med en prick på r = 4,5 pt

@@ -17,6 +17,8 @@ struct TrailScreen: View {
     private static let lineWidth: CGFloat = 4
     private static let inset: Double = 12
     private static let fadedOpacity: Double = 0.28
+    /// The triangle and the number reach this far from the max point.
+    private static let markerReach: Double = 46
 
     private var hasTrail: Bool { trail.points.count >= 2 && trip.maxSpeed > 0 }
 
@@ -159,22 +161,24 @@ struct TrailScreen: View {
         endContext.stroke(dot, with: .color(Theme.background), lineWidth: 4)
         endContext.fill(dot, with: .color(Theme.primary))
 
-        // Max: the dial's orange triangle pointing at the spot, with the number beside it.
+        // Max: the dial's orange triangle pointing at the spot across the line, with the number beyond it.
         if let m = layout.maxIndex {
             let p = cg(layout.points[m])
-            let onLeft = p.x > size.width - 60
-            let dir: CGFloat = onLeft ? -1 : 1
+            let d = layout.markerDirection(at: m, reach: TrailScreen.markerReach)
+            let n = CGPoint(x: d.x, y: d.y)
+            let across = CGPoint(x: -n.y, y: n.x)
             var triangle = Path()
-            triangle.move(to: CGPoint(x: p.x + dir * 9, y: p.y))
-            triangle.addLine(to: CGPoint(x: p.x + dir * 21, y: p.y - 5.5))
-            triangle.addLine(to: CGPoint(x: p.x + dir * 21, y: p.y + 5.5))
+            triangle.move(to: CGPoint(x: p.x + n.x * 9, y: p.y + n.y * 9))
+            triangle.addLine(to: CGPoint(x: p.x + n.x * 21 + across.x * 5.5, y: p.y + n.y * 21 + across.y * 5.5))
+            triangle.addLine(to: CGPoint(x: p.x + n.x * 21 - across.x * 5.5, y: p.y + n.y * 21 - across.y * 5.5))
             triangle.closeSubpath()
             context.fill(triangle, with: .color(Theme.accent))
             let label = Text(Format.speed(trip.maxSpeed, unit: unit))
                 .font(.system(size: 13, weight: .semibold))
                 .monospacedDigit()
                 .foregroundStyle(Theme.accent)
-            context.draw(label, at: CGPoint(x: p.x + dir * 25, y: p.y), anchor: onLeft ? .trailing : .leading)
+            let anchor: UnitPoint = abs(n.x) >= abs(n.y) ? (n.x > 0 ? .leading : .trailing) : (n.y < 0 ? .bottom : .top)
+            context.draw(label, at: CGPoint(x: p.x + n.x * 25, y: p.y + n.y * 25), anchor: anchor)
         }
 
         // The finger: a ring with the colour of that spot inside.

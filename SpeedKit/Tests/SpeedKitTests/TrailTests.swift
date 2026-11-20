@@ -198,6 +198,28 @@ final class TrailTests: XCTestCase {
         XCTAssertEqual(l.nearestIndex(to: TrailXY(x: 50, y: 990)), 0)
     }
 
+    func testTheMaxMarkerGoesAcrossTheLineAndAwayFromTheMiddle() {
+        // A box: up the west side, east along the top, down the east side.
+        var t = Trail()
+        for n in stride(from: 0.0, through: 1000, by: 50) { add(&t, north: n, east: 0) }
+        for e in stride(from: 50.0, through: 1000, by: 50) { add(&t, north: 1000, east: e) }
+        for n in stride(from: 950.0, through: 0, by: -50) { add(&t, north: n, east: 1000) }
+        let top = 30 // on the top edge, going east
+        let west = 5 // on the west side, going north
+        // Room around the box: the marker goes outward.
+        let roomy = TrailLayout(trail: t, topSpeed: 5, width: 400, height: 400, inset: 60)
+        let up = roomy.markerDirection(at: top, reach: 46)
+        XCTAssertEqual(up.x, 0, accuracy: 1e-6)
+        XCTAssertEqual(up.y, -1, accuracy: 1e-6)
+        let left = roomy.markerDirection(at: west, reach: 46)
+        XCTAssertEqual(left.x, -1, accuracy: 1e-6)
+        XCTAssertEqual(left.y, 0, accuracy: 1e-6)
+        // Tight against the edge: it turns inward instead.
+        let tight = TrailLayout(trail: t, topSpeed: 5, width: 400, height: 400, inset: 12)
+        let down = tight.markerDirection(at: top, reach: 46)
+        XCTAssertEqual(down.y, 1, accuracy: 1e-6)
+    }
+
     func testAnEmptyTrailHasNoLayout() {
         let l = TrailLayout(trail: Trail(), topSpeed: 5, width: 300, height: 300)
         XCTAssertTrue(l.points.isEmpty)
