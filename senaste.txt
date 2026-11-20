@@ -1,9 +1,12 @@
-b7c854420e0ec2e4c9e9c1507d85162d15138288 claude/serene-curie-5ojh0u 2026-11-20T21:27:32Z run 44820366545
+4d3d9a96e28d8ba03914051fa4c1cb47f6806d42 claude/serene-curie-5ojh0u 2026-11-20T21:30:48Z run 44820804361
 == swift-release
-GRÖNT: 48 test, 0 fel, 0 s i testerna, bygget 10 s
-Långsammast (av 48):
+GRÖNT: 55 test, 0 fel, 0 s i testerna, bygget 7 s
+Långsammast (av 55):
+      0.1 s  TrailTests.testRunsGroupTheSameLevelAndLeaveOutGaps
+      0.1 s  TrailTests.testResetClearsTheTrailWithTheTrip
+      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TrailTests.testColourLevels
       0.0 s  TrailTests.testThinningKeepsTheEndsAndTheGapsAndDoublesTheSpacing
-      0.0 s  TripEngineTests.testAPositionWithoutSpeedKeepsTheGPSAlive
       0.0 s  TrailTests.testCodableRoundTrip
       0.0 s  DialAndFormatTests.testAverageFormat
       0.0 s  TripEngineTests.testTripCodableRoundTrip
@@ -14,8 +17,5 @@ Långsammast (av 48):
       0.0 s  TripEngineTests.testShortDipDoesNotPause
       0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
       0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
-      0.0 s  TripEngineTests.testResumesAtOnePointFour
-      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
-      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
 
 == metod-och-beslut: success
