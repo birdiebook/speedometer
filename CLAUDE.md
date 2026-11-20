@@ -9,7 +9,7 @@ App Store är "speedometer - minimalist" (BESLUT B2). Etapperna står i [PLAN.md
 - **Repot är publikt.** Ingen e-postadress, ingen lokal sökväg, ingen nyckel och inget personnamn i något som
   committas: kod, dokument, commit-meddelanden. Hemligheter ligger bara i repots Actions-hemligheter.
 - **Appen skickar ingenting** (BESLUT B3). Ingen nätverkskod, ingen analys, inga tredjepartsbibliotek. Platsen
-  läses med "When In Use": medan appen är öppen och, under en tur, med skärmen släckt (BESLUT B17). Det som sparas,
+  läses med "When In Use": medan appen är öppen, och i bakgrunden under en tur (BESLUT B17). Det som sparas,
   turens tal och spåret för den pågående turen (BESLUT B16), sparas bara på telefonen. Det är det som låter App Store visa "Data Not Collected".
 - **Appen är på engelska** (BESLUT B8). Dokumenten här är på svenska; kod och kommentarer på engelska.
 - **Extremt enkel** (BESLUT B5, B6, B14): en skärm, inga knappar, ingen inställning; det som kommer till ligger

@@ -24,8 +24,9 @@ Klart när:
   (METOD M9) och sidan (METOD M10, FORM.md). Kvar: provtur på cykeln. Tuna konstanterna i METOD M2–M3 och M9, och
   pröva att stänga Trail med ett svep nedåt (ett svep som börjar på spåret visar farten i stället).
   Provturen visade att spåret tappades med skärmen släckt.
-- **Bygge 4** (efter ägarens ja): turen fortsätter med skärmen släckt (BESLUT B17, METOD M11). Provtur med telefonen
-  låst i fickan: spåret ska vara helt, och GPS ska stängas av efter 10 min stillastående i bakgrunden.
+- **Bygge 4** (efter ägarens ja): hela turen med skärmen släckt, utan startknapp (BESLUT B17, METOD M11). Provtur med
+  telefonen låst i fickan, gärna med ett stopp på över 2 min: spåret ska vara helt utom en kort bit efter stoppet,
+  och den blå platsmarkeringen ska försvinna en timme efter turen.
 
 ## E3 — Publiceringen
 

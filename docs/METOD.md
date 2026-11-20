@@ -77,7 +77,13 @@ och ett med en färg i FORM.md. Fingret väljer den punkt som ligger närmast p�
 
 ## M11 — Platsen i bakgrunden
 
-När appen går till bakgrunden (skärmen släckt eller en annan app framme) fortsätter platsen att läsas så länge turen
-har rullat (M3) inom de senaste **10 min**. Har den inte det stängs GPS av, direkt eller senare, tills appen öppnas
-igen. Kontrollen görs vid varje prov och en gång i sekunden. Status: antagande; en avvägning mellan batteriet och
-att ett rödljus, en paus eller ett köp på vägen inte ska bryta turen.
+I förgrunden är GPS alltid full: bästa noggrannhet och varje prov. När appen går till bakgrunden (skärmen släckt eller
+en annan app framme) fortsätter den, även om turen inte hunnit börja rulla. Tiden utan rullning räknas från det
+senaste av: senaste provet som rullade (M3), när appen gick till bakgrunden och senaste väckningen.
+- Efter **2 min** utan rullning går GPS över till sparläge: noggrannhet **100 m** och ett nytt prov först efter
+  **50 m** förflyttning, så att telefonen mest använder mobilnät och wifi.
+- I sparläget väcks full GPS när ett prov ligger mer än **100 m** från sparlägets första prov, eller när turen rullar.
+  Var det ett falskt larm går den tillbaka till sparläget efter 2 min.
+- Efter **60 min** utan rullning stängs GPS av helt, tills appen öppnas.
+Kontrollen görs vid varje prov och en gång i sekunden. Status: antaganden. 100 m ligger över hur mycket en position
+från wifi brukar hoppa; i gengäld kan början efter ett stopp, upp till ett par hundra meter, bli en prickad bit (M9).

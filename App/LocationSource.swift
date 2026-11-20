@@ -1,7 +1,7 @@
 import CoreLocation
 import SpeedKit
 
-/// The phone's GPS (BESLUT B3, B17): "When In Use"; the store decides when it runs, which during a ride includes the
+/// The phone's GPS (BESLUT B3, B17): "When In Use"; the store decides how it runs (`GPSMode`, METOD M11), also in the
 /// background, with iOS's blue location indicator.
 /// Only a `GPSSample` leaves this class: speed, accuracies and the coordinates for the trail of the current trip,
 /// which stays on the phone (BESLUT B16).
@@ -29,8 +29,24 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
 
     var authorizationStatus: CLAuthorizationStatus { manager.authorizationStatus }
 
+    /// METOD M11: full or saving accuracy, or off.
+    func run(_ mode: GPSMode) {
+        switch mode {
+        case .off:
+            stop()
+        case .full:
+            manager.desiredAccuracy = kCLLocationAccuracyBest
+            manager.distanceFilter = kCLDistanceFilterNone
+            start()
+        case .saving:
+            manager.desiredAccuracy = GPSPlan.savingAccuracy
+            manager.distanceFilter = GPSPlan.savingDistanceFilter
+            start()
+        }
+    }
+
     /// Asks for permission the first time, then starts updates once allowed.
-    func start() {
+    private func start() {
         wanted = true
         if manager.authorizationStatus == .notDetermined {
             manager.requestWhenInUseAuthorization()
@@ -39,7 +55,7 @@ final class LocationSource: NSObject, CLLocationManagerDelegate {
     }
 
     /// BESLUT B17: the GPS off, the background session ended.
-    func stop() {
+    private func stop() {
         wanted = false
         manager.stopUpdatingLocation()
         backgroundSession?.invalidate()
