@@ -1,13 +1,10 @@
-117744caa87075156b34af44914eb90237a9b1d9 main 2026-11-20T16:28:18Z run 44773591419
+117744caa87075156b34af44914eb90237a9b1d9 claude/serene-curie-5ojh0u 2026-11-20T16:28:19Z run 44773582569
 == swift-release
-GRÖNT: 48 test, 0 fel, 0 s i testerna, bygget 10 s
+GRÖNT: 48 test, 0 fel, 0 s i testerna, bygget 5 s
 Långsammast (av 48):
+      0.1 s  TrailTests.testTheMaxMarkerGoesAcrossTheLineAndAwayFromTheMiddle
       0.0 s  TrailTests.testThinningKeepsTheEndsAndTheGapsAndDoublesTheSpacing
       0.0 s  TripEngineTests.testTripCodableRoundTrip
-      0.0 s  TripEngineTests.testAPositionWithoutSpeedKeepsTheGPSAlive
-      0.0 s  TripEngineTests.testAPositionWithoutSpeedIsAStopNotMissingGPS
-      0.0 s  TrailTests.testCodableRoundTrip
-      0.0 s  DialAndFormatTests.testAverageFormat
       0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
       0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
       0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
@@ -17,5 +14,8 @@ Långsammast (av 48):
       0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
       0.0 s  TripEngineTests.testResumesAtOnePointFour
       0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+      0.0 s  TripEngineTests.testResetClearsTheTripAndKeepsTheMode
+      0.0 s  TripEngineTests.testRecoversFromFindingGPSWithoutAddingTheGap
+      0.0 s  TripEngineTests.testNothingCountsWhilePaused
 
 == metod-och-beslut: success
