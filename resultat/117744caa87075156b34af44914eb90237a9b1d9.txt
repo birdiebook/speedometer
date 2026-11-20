@@ -1,0 +1,21 @@
+117744caa87075156b34af44914eb90237a9b1d9 main 2026-11-20T16:28:18Z run 44773591419
+== swift-release
+GRÖNT: 48 test, 0 fel, 0 s i testerna, bygget 10 s
+Långsammast (av 48):
+      0.0 s  TrailTests.testThinningKeepsTheEndsAndTheGapsAndDoublesTheSpacing
+      0.0 s  TripEngineTests.testTripCodableRoundTrip
+      0.0 s  TripEngineTests.testAPositionWithoutSpeedKeepsTheGPSAlive
+      0.0 s  TripEngineTests.testAPositionWithoutSpeedIsAStopNotMissingGPS
+      0.0 s  TrailTests.testCodableRoundTrip
+      0.0 s  DialAndFormatTests.testAverageFormat
+      0.0 s  TripEngineTests.testTickDoesNothingBeforeTheFirstFix
+      0.0 s  TripEngineTests.testThreeSecondsWithoutSpeedWhileRidingPauses
+      0.0 s  TripEngineTests.testStaysPausedAtOneMeterPerSecond
+      0.0 s  TripEngineTests.testSmoothingFollowsTheExponentialAndConverges
+      0.0 s  TripEngineTests.testShortDipDoesNotPause
+      0.0 s  TripEngineTests.testSamplesWithoutAPositionAreIgnored
+      0.0 s  TripEngineTests.testRidingWithoutSpeedPausesAfterThreeSecondsAndLosesGPSAfterFifteen
+      0.0 s  TripEngineTests.testResumesAtOnePointFour
+      0.0 s  TripEngineTests.testRestoredTripStartsInFindingGPSWithItsNumbers
+
+== metod-och-beslut: success
