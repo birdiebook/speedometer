@@ -19,12 +19,10 @@ Klart när:
 - Appikonen (klar, BESLUT B12).
 - `testflight.yml` grönt (BESLUT B13): bygge 1 uppladdat 2026-11-17, första försöket; bygge 2 samma kväll med rättelsen i METOD M1 och M3 (position utan fart
   är stillastående). Kvar: provtur på cykeln.
-- **Bygge 3** (väntar på provturen, så att det ägaren märker på cykeln kommer med; inget bygge utan ja): på `main`
-  ligger redan 15 s innan finding GPS och paus efter 3 s utan fart även utan positioner (METOD M3), och ingen
-  PAUSED före första turen (BESLUT B15). Lägg till det provturen visar, främst konstanterna i METOD M2–M3. Provtur på cykeln; konstanterna i METOD M2–M3 tunas.
-
-- **Trail** (BESLUT B16, ägaren 2026-11-20): menyn (B14), spåret (METOD M9) och sidan (METOD M10, FORM.md). Grönt i
-  CI krävs; provas på cykeln med nästa bygge, efter ägarens ja.
+- **Bygge 3** uppladdat 2026-11-20 efter ägarens ja: 15 s innan finding GPS och paus efter 3 s utan fart även utan
+  positioner (METOD M3), ingen PAUSED före första turen (BESLUT B15), och Trail (BESLUT B16): menyn (B14), spåret
+  (METOD M9) och sidan (METOD M10, FORM.md). Kvar: provtur på cykeln. Tuna konstanterna i METOD M2–M3 och M9, och
+  pröva att stänga Trail med ett svep nedåt (ett svep som börjar på spåret visar farten i stället).
 
 ## E3 — Publiceringen
 
